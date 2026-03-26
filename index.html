@@ -2,14 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mi Biblioteca</title>
-<meta name="description" content="Tu biblioteca personal de libros">
-<meta name="theme-color" content="#b5622a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Mi Biblioteca">
-<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -342,33 +336,6 @@
     position: relative;
     overflow: hidden;
     line-height: 1.45;
-  }
-
-  /* real cover photo */
-  .book-cover img.cover-img {
-    position: absolute;
-    inset: 0; width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;
-    border-radius: 2px 6px 0 0;
-    transition: opacity 0.3s;
-  }
-  /* subtle dark gradient over photo so badges stay readable */
-  .book-cover.has-cover::after {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.32) 100%);
-  }
-  /* spinner */
-  .cover-spinner {
-    font-size: 1.2rem;
-    animation: coverSpin 1s linear infinite;
-    position: absolute; z-index: 2;
-  }
-  @keyframes coverSpin { to { transform: rotate(360deg); } }
-
-  /* detail panel cover image */
-  .detail-cover img.cover-img {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;
   }
 
   .book-cover-text {
@@ -772,202 +739,116 @@
   }
   .btn-danger:hover { background: rgba(192,82,58,0.18); }
 
-  /* ══════════════════════════════════════════════
-     MOBILE HAMBURGER BUTTON
-  ══════════════════════════════════════════════ */
-  .menu-btn {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.4rem;
-    font-size: 1.4rem;
-    color: var(--accent);
-    line-height: 1;
+  /* ── AUTH SCREEN ─────────────────────────────── */
+  #authScreen {
+    position: fixed; inset: 0; z-index: 500;
+    background-image: var(--bookshelf);
+    background-size: cover; background-position: center;
+    display: flex; align-items: center; justify-content: center;
   }
-
-  /* sidebar overlay for mobile */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(30,15,5,0.5);
-    z-index: 149;
-    backdrop-filter: blur(2px);
+  #authScreen::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(30,18,8,0.75);
   }
-  .sidebar-overlay.open { display: block; }
-
-  /* ══════════════════════════════════════════════
-     BOTTOM NAV BAR (mobile only)
-  ══════════════════════════════════════════════ */
-  .bottom-nav {
-    display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 62px;
-    background: var(--surface);
-    border-top: 1px solid var(--border2);
-    z-index: 150;
-    box-shadow: 0 -4px 16px rgba(100,70,40,0.12);
-    padding-bottom: env(safe-area-inset-bottom);
+  .auth-card {
+    position: relative; z-index: 1;
+    background: var(--surface); background-image: var(--paper);
+    border: 1px solid var(--border2); border-radius: 16px;
+    padding: 2.5rem 2rem; width: 340px; max-width: 92vw;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
   }
-  .bottom-nav-inner {
-    display: flex;
-    height: 100%;
-    align-items: stretch;
+  .auth-card h1 { font-family:'Lora',serif; font-size:1.6rem; font-style:italic; color:var(--accent); margin-bottom:0.4rem; }
+  .auth-card p  { font-size:1rem; color:var(--text2); margin-bottom:2rem; line-height:1.5; }
+  .btn-google {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0.75rem; width: 100%; padding: 0.75rem 1.25rem;
+    background: #fff; color: #3c4043;
+    border: 1px solid #dadce0; border-radius: 8px;
+    font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    font-family: 'DM Sans', sans-serif;
   }
-  .bnav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.15rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--text3);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.55rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.2rem;
-    transition: color 0.15s, background 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    border-top: 2px solid transparent;
+  .btn-google:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .btn-google img { width: 20px; height: 20px; }
+  .auth-error { margin-top:1rem; font-size:.85rem; color:var(--red); display:none; }
+
+  /* ── USER MENU ───────────────────────────────── */
+  .user-menu { display:flex; align-items:center; gap:0.6rem; }
+  .user-avatar { width:30px; height:30px; border-radius:50%; border:2px solid var(--border2); object-fit:cover; }
+  .user-name { font-size:.82rem; color:var(--text2); font-family:'Crimson Pro',serif; font-style:italic; max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .btn-signout { font-size:.75rem; padding:.3rem .7rem; border-radius:12px; border:1px solid var(--border2); background:transparent; color:var(--text3); cursor:pointer; font-family:'DM Mono',monospace; transition:all .15s; }
+  .btn-signout:hover { background:var(--surface3); color:var(--red); }
+
+  /* ── SYNC DOT ────────────────────────────────── */
+  .sync-dot { width:7px; height:7px; border-radius:50%; background:var(--green); opacity:0; transition:opacity .3s; flex-shrink:0; }
+  .sync-dot.syncing { opacity:1; animation:syncPulse 1s ease infinite; }
+  @keyframes syncPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+
+  /* ── MOBILE ──────────────────────────────────── */
+  .menu-btn { display:none; background:none; border:none; cursor:pointer; padding:.4rem; font-size:1.4rem; color:var(--accent); line-height:1; }
+  .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(30,15,5,.5); z-index:149; backdrop-filter:blur(2px); }
+  .sidebar-overlay.open { display:block; }
+  .bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; height:62px; background:var(--surface); border-top:1px solid var(--border2); z-index:150; box-shadow:0 -4px 16px rgba(100,70,40,.12); padding-bottom:env(safe-area-inset-bottom); }
+  .bottom-nav-inner { display:flex; height:100%; align-items:stretch; }
+  .bnav-btn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.15rem; background:none; border:none; cursor:pointer; color:var(--text3); font-family:'DM Mono',monospace; font-size:.55rem; text-transform:uppercase; letter-spacing:.06em; padding:.3rem .2rem; transition:color .15s,background .15s; -webkit-tap-highlight-color:transparent; border-top:2px solid transparent; }
+  .bnav-btn .bnav-icon { font-size:1.25rem; line-height:1; }
+  .bnav-btn.active { color:var(--accent); border-top-color:var(--accent); background:var(--accent-soft); }
+  .bnav-btn:active { background:var(--surface3); }
+
+  @media (max-width:900px) { .header-stats { display:none; } }
+
+  @media (max-width:700px) {
+    header { height:56px; padding:0 1rem; }
+    .logo { font-size:1.1rem; }
+    .logo span { display:none; }
+    .menu-btn { display:flex; }
+    .sidebar { position:fixed; top:0; left:0; bottom:0; width:280px; z-index:150; transform:translateX(-100%); transition:transform .28s ease; padding-top:56px; box-shadow:4px 0 24px rgba(100,70,40,.2); }
+    .sidebar.open { transform:translateX(0); }
+    .app { height:calc(100vh - 56px - 62px); }
+    .main { padding:1rem; }
+    .toolbar { gap:.5rem; margin-bottom:1rem; }
+    .search-wrap { min-width:0; order:-1; flex-basis:100%; }
+    .search-wrap input { font-size:1rem; }
+    .sort-select { flex:1; font-size:.9rem; }
+    .btn { font-size:.85rem; padding:.55rem .8rem; }
+    .books-grid { grid-template-columns:repeat(2,1fr); gap:.9rem; }
+    .book-cover { height:160px; }
+    .book-info { padding:.5rem .6rem; }
+    .book-title { font-size:.75rem; }
+    .book-author { font-size:.68rem; }
+    .book-row-genre,.book-row-year,.book-row-rating { display:none; }
+    .detail-panel { position:fixed; bottom:62px; left:0; right:0; width:100%; height:72vh; border-left:none; border-top:2px solid var(--border2); border-radius:20px 20px 0 0; box-shadow:0 -8px 30px rgba(100,70,40,.18); z-index:140; overflow-y:auto; transform:translateY(100%); transition:transform .3s ease; display:block !important; padding-bottom:calc(1.5rem + env(safe-area-inset-bottom)); }
+    .detail-panel.open { transform:translateY(0); }
+    .modal { width:100%!important; max-width:100%!important; max-height:92vh; border-radius:20px 20px 0 0; }
+    .modal-overlay { align-items:flex-end; }
+    .bottom-nav { display:block; }
+    .toast { bottom:72px; right:1rem; left:1rem; }
+    .form-row { grid-template-columns:1fr; }
+    .sidebar-item { padding:.75rem 1.5rem; font-size:1.05rem; }
+    select,input,textarea { font-size:1rem!important; }
   }
-  .bnav-btn .bnav-icon { font-size: 1.25rem; line-height: 1; }
-  .bnav-btn.active {
-    color: var(--accent);
-    border-top-color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .bnav-btn:active { background: var(--surface3); }
-
-  /* ══════════════════════════════════════════════
-     RESPONSIVE BREAKPOINTS
-  ══════════════════════════════════════════════ */
-  @media (max-width: 900px) {
-    /* hide header stats on small screens */
-    .header-stats { display: none; }
-  }
-
-  @media (max-width: 700px) {
-    /* ── Header ── */
-    header {
-      height: 56px;
-      padding: 0 1rem;
-    }
-    .logo { font-size: 1.1rem; }
-    .logo span { display: none; }
-    .menu-btn { display: flex; }
-
-    /* ── Sidebar becomes a slide-in drawer ── */
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      width: 280px;
-      z-index: 150;
-      transform: translateX(-100%);
-      transition: transform 0.28s ease;
-      padding-top: 56px;
-      box-shadow: 4px 0 24px rgba(100,70,40,0.2);
-    }
-    .sidebar.open { transform: translateX(0); }
-
-    /* ── App layout ── */
-    .app {
-      height: calc(100vh - 56px - 62px); /* header + bottom nav */
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
-    /* ── Main area ── */
-    .main { padding: 1rem 1rem 1rem; }
-
-    /* ── Toolbar: stack on two lines ── */
-    .toolbar {
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .search-wrap { min-width: 0; order: -1; flex-basis: 100%; }
-    .search-wrap input { font-size: 1rem; padding: 0.7rem 1rem 0.7rem 2.5rem; }
-    .sort-select { flex: 1; font-size: 0.9rem; padding: 0.6rem 0.6rem; }
-    .btn { font-size: 0.85rem; padding: 0.55rem 0.8rem; }
-
-    /* ── Grid: 2 columns on phone ── */
-    .books-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.9rem;
-    }
-    .book-cover { height: 160px; }
-    .book-cover-text { font-size: 0.82rem; }
-    .book-title { font-size: 0.75rem; }
-    .book-author { font-size: 0.68rem; }
-    .book-info { padding: 0.5rem 0.6rem; }
-
-    /* ── List view: hide extra columns ── */
-    .book-row-genre,
-    .book-row-year,
-    .book-row-rating { display: none; }
-
-    /* ── Detail panel becomes a bottom sheet ── */
-    .detail-panel {
-      position: fixed;
-      bottom: 62px; left: 0; right: 0;
-      width: 100%;
-      height: 72vh;
-      border-left: none;
-      border-top: 2px solid var(--border2);
-      border-radius: 20px 20px 0 0;
-      box-shadow: 0 -8px 30px rgba(100,70,40,0.18);
-      z-index: 140;
-      overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-      display: block !important;
-      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
-    }
-    .detail-panel.open { transform: translateY(0); }
-
-    /* ── Modals: full screen on phone ── */
-    .modal {
-      width: 100% !important;
-      max-width: 100% !important;
-      max-height: 92vh;
-      border-radius: 20px 20px 0 0;
-      margin-top: auto;
-    }
-    .modal-overlay {
-      align-items: flex-end;
-    }
-    .modal-overlay.open .modal { transform: translateY(0); }
-
-    /* ── Bottom nav visible ── */
-    .bottom-nav { display: block; }
-
-    /* ── Toast above bottom nav ── */
-    .toast { bottom: 72px; right: 1rem; left: 1rem; }
-
-    /* ── Forms: single column ── */
-    .form-row { grid-template-columns: 1fr; }
-
-    /* ── Bigger tap targets ── */
-    .sidebar-item { padding: 0.75rem 1.5rem; font-size: 1.05rem; }
-    .btn { min-height: 40px; }
-    select, input, textarea { font-size: 1rem !important; } /* prevent iOS zoom */
-  }
-
-  @media (max-width: 380px) {
-    .books-grid { grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
-    .book-cover { height: 140px; }
-  }
+  @media (max-width:380px) { .book-cover { height:140px; } }
 
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div style="font-size:3rem;margin-bottom:.75rem">📚</div>
+    <h1>Mi Biblioteca</h1>
+    <p>Inicia sesión para acceder a tu colección desde cualquier dispositivo.</p>
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Continuar con Google
+    </button>
+    <div class="auth-error" id="authError">No se pudo iniciar sesión. Inténtalo de nuevo.</div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -975,13 +856,23 @@
   <div class="logo">
     📚 Mi Biblioteca <span>/ colección personal</span>
   </div>
-  <div class="header-stats" id="headerStats">
+  <div style="display:flex;align-items:center;gap:1rem;margin-left:auto">
+    <span class="sync-dot" id="syncDot"></span>
+    <div class="header-stats" id="headerStats">
     <div>Total: <strong id="statTotal">0</strong></div>
     <div>Leídos: <strong id="statRead">0</strong></div>
     <div>Leyendo: <strong id="statReading">0</strong></div>
     <div>Pendientes: <strong id="statPending">0</strong></div>
+    </div>
+    <div class="user-menu" id="userMenu" style="display:none">
+      <img class="user-avatar" id="userAvatar" src="" alt="">
+      <span class="user-name" id="userName"></span>
+      <button class="btn-signout" onclick="signOut()">Salir</button>
+    </div>
   </div>
 </header>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <!-- APP -->
 <div class="app">
@@ -1040,7 +931,6 @@
         <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">☰</button>
       </div>
       <button class="btn" onclick="openCSVModal()">📥 Importar CSV</button>
-      <button class="btn" onclick="exportCSV()">📤 Exportar CSV</button>
       <button class="btn btn-primary" onclick="openAddModal()">+ Añadir libro</button>
     </div>
 
@@ -1252,40 +1142,132 @@
   </div>
 </div>
 
-<script>
-// ==================== DATA ====================
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, writeBatch, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDavAY7aHqQahg6MEP9fakchg9FxW-vU9s",
+  authDomain: "mi-biblioteca-97f70.firebaseapp.com",
+  projectId: "mi-biblioteca-97f70",
+  storageBucket: "mi-biblioteca-97f70.firebasestorage.app",
+  messagingSenderId: "453886529018",
+  appId: "1:453886529018:web:09d8fe677990f886792843"
+};
+
+const fbApp   = initializeApp(firebaseConfig);
+const auth    = getAuth(fbApp);
+const db      = getFirestore(fbApp);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+let unsubBooks = null;
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+window.signInWithGoogle = async function() {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    document.getElementById('authError').style.display = 'block';
+  }
+};
+
+window.signOut = async function() {
+  if (unsubBooks) unsubBooks();
+  library = [];
+  await fbSignOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('userMenu').style.display = 'flex';
+    document.getElementById('userAvatar').src = user.photoURL || '';
+    document.getElementById('userName').textContent = (user.displayName || '').split(' ')[0];
+    startListening();
+  } else {
+    currentUser = null;
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('userMenu').style.display = 'none';
+    if (unsubBooks) { unsubBooks(); unsubBooks = null; }
+    library = [];
+    renderAll();
+  }
+});
+
+// ── FIRESTORE HELPERS ─────────────────────────────────────────────────────────
+function booksCol() {
+  return collection(db, 'users', currentUser.uid, 'books');
+}
+
+function startListening() {
+  if (unsubBooks) unsubBooks();
+  setSyncing(true);
+  unsubBooks = onSnapshot(booksCol(), snap => {
+    library = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+    renderAll();
+    setSyncing(false);
+  }, err => {
+    console.error(err);
+    setSyncing(false);
+    showToast('Error de conexión', 'error');
+  });
+}
+
+function setSyncing(on) {
+  document.getElementById('syncDot').classList.toggle('syncing', on);
+}
+
+async function saveToCloud(book) {
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    await setDoc(doc(booksCol(), String(book.id)), { ...book, updatedAt: serverTimestamp() });
+  } catch(e) {
+    showToast('No se pudo guardar', 'error');
+  }
+}
+
+async function deleteFromCloud(id) {
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    await deleteDoc(doc(booksCol(), String(id)));
+  } catch(e) {
+    showToast('No se pudo eliminar', 'error');
+  }
+}
+
+function save() { /* no-op: each operation calls saveToCloud directly */ }
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
 const GENRE_COLORS = {
-  'Ficción': '#c94c4c',
-  'No ficción': '#4caa70',
-  'Historia': '#c97a4c',
-  'Ciencia': '#4c7ec9',
-  'Filosofía': '#8a4cc9',
-  'Poesía': '#c94c8a',
-  'Tecnología': '#4cc9aa',
-  'Economía': '#c9c94c',
-  'Arte': '#c97ac9',
-  'Autobiografía': '#7ac9c9',
-  'Ensayo': '#9ac94c',
-  'Thriller': '#c94c70',
-  'Terror': '#8c4c4c',
-  'Romance': '#c96490',
-  'Fantasía': '#6a4cc9',
-  'Ciencia ficción': '#4c70c9',
-  'Misterio': '#7c6c4c',
-  'Humor': '#c9b44c',
+  'Ficcion': '#c94c4c', 'No ficcion': '#4caa70', 'Historia': '#c97a4c',
+  'Ciencia': '#4c7ec9', 'Filosofia': '#8a4cc9', 'Poesia': '#c94c8a',
+  'Tecnologia': '#4cc9aa', 'Economia': '#c9c94c', 'Arte': '#c97ac9',
+  'Autobiografia': '#7ac9c9', 'Ensayo': '#9ac94c', 'Thriller': '#c94c70',
+  'Terror': '#8c4c4c', 'Romance': '#c96490', 'Fantasia': '#6a4cc9',
+  'Ciencia ficcion': '#4c70c9', 'Misterio': '#7c6c4c', 'Humor': '#c9b44c',
   'Juvenil': '#4caacc',
+  'Ficción': '#c94c4c', 'Filosofía': '#8a4cc9', 'Poesía': '#c94c8a',
+  'Tecnología': '#4cc9aa', 'Economía': '#c9c94c', 'Autobiografía': '#7ac9c9',
+  'Fantasía': '#6a4cc9', 'Ciencia ficción': '#4c70c9',
 };
 
 function getGenreColor(genre) {
-  if (!genre) return '#6b6560';
+  if (!genre) return '#b09880';
   if (GENRE_COLORS[genre]) return GENRE_COLORS[genre];
   let hash = 0;
   for (let c of genre) hash = c.charCodeAt(0) + ((hash << 5) - hash);
-  const colors = Object.values(GENRE_COLORS);
-  return colors[Math.abs(hash) % colors.length];
+  const vals = Object.values(GENRE_COLORS);
+  return vals[Math.abs(hash) % vals.length];
 }
 
-let library = JSON.parse(localStorage.getItem('myLibrary') || '[]');
+let library = [];
 let currentFilter = 'all';
 let currentGenreFilter = null;
 let currentLocationFilter = null;
@@ -1295,31 +1277,28 @@ let currentRating = 0;
 let currentLocation = '';
 let selectedBookId = null;
 
-function save() {
-  localStorage.setItem('myLibrary', JSON.stringify(library));
-}
-
-// ==================== SAMPLE DATA ====================
-function loadSamples() {
+// ── SAMPLE DATA ───────────────────────────────────────────────────────────────
+window.loadSamples = async function() {
+  if (!currentUser) return;
   const samples = [
-    { id: 1, title: 'Cien años de soledad', author: 'Gabriel García Márquez', year: 1967, genre: 'Ficción', status: 'read', rating: 5, pages: 471, publisher: 'Editorial Sudamericana', language: 'Español', isbn: '', notes: 'Una obra maestra del realismo mágico. Imprescindible.', location: 'cdmx' },
-    { id: 2, title: 'El nombre de la rosa', author: 'Umberto Eco', year: 1980, genre: 'Misterio', status: 'read', rating: 4, pages: 502, publisher: 'Planeta', language: 'Español', isbn: '', notes: '', location: 'mixqui' },
-    { id: 3, title: 'Sapiens', author: 'Yuval Noah Harari', year: 2011, genre: 'Historia', status: 'read', rating: 5, pages: 443, publisher: 'Debate', language: 'Español', isbn: '', notes: 'Perspectiva fascinante sobre la historia humana.', location: 'cdmx' },
-    { id: 4, title: 'El Señor de los Anillos', author: 'J.R.R. Tolkien', year: 1954, genre: 'Fantasía', status: 'reading', rating: 0, pages: 1137, publisher: 'Minotauro', language: 'Español', isbn: '', notes: '', location: 'cdmx' },
-    { id: 5, title: '1984', author: 'George Orwell', year: 1949, genre: 'Ciencia ficción', status: 'read', rating: 5, pages: 328, publisher: 'Destino', language: 'Español', isbn: '', notes: 'Distopía brillante y perturbadora.', location: 'mixqui' },
-    { id: 6, title: 'Meditaciones', author: 'Marco Aurelio', year: 161, genre: 'Filosofía', status: 'read', rating: 5, pages: 254, publisher: 'Gredos', language: 'Español', isbn: '', notes: 'Guía estoica de vida. Releerlo cada año.', location: 'mixqui' },
-    { id: 7, title: 'El universo en una cáscara de nuez', author: 'Stephen Hawking', year: 2001, genre: 'Ciencia', status: 'pending', rating: 0, pages: 224, publisher: 'Planeta', language: 'Español', isbn: '', notes: '', location: 'cdmx' },
-    { id: 8, title: 'Crimen y castigo', author: 'Fiódor Dostoyevski', year: 1866, genre: 'Ficción', status: 'wishlist', rating: 0, pages: 671, publisher: 'Alianza', language: 'Español', isbn: '', notes: '', location: '' },
-    { id: 9, title: 'Educated', author: 'Tara Westover', year: 2018, genre: 'Autobiografía', status: 'read', rating: 4, pages: 334, publisher: 'Harper Collins', language: 'Español', isbn: '', notes: 'Historia de superación increíble.', location: 'mixqui' },
-    { id: 10, title: 'Dune', author: 'Frank Herbert', year: 1965, genre: 'Ciencia ficción', status: 'pending', rating: 0, pages: 688, publisher: 'Círculo de Lectores', language: 'Español', isbn: '', notes: '', location: 'cdmx' },
+    { id:'s1', title:'Cien anos de soledad', author:'Gabriel Garcia Marquez', year:1967, genre:'Ficción', status:'read', rating:5, pages:471, publisher:'Editorial Sudamericana', language:'Español', isbn:'', notes:'Una obra maestra del realismo magico.', location:'cdmx' },
+    { id:'s2', title:'El nombre de la rosa', author:'Umberto Eco', year:1980, genre:'Misterio', status:'read', rating:4, pages:502, publisher:'Planeta', language:'Español', isbn:'', notes:'', location:'mixqui' },
+    { id:'s3', title:'Sapiens', author:'Yuval Noah Harari', year:2011, genre:'Historia', status:'read', rating:5, pages:443, publisher:'Debate', language:'Español', isbn:'', notes:'', location:'cdmx' },
+    { id:'s4', title:'El Senor de los Anillos', author:'J.R.R. Tolkien', year:1954, genre:'Fantasía', status:'reading', rating:0, pages:1137, publisher:'Minotauro', language:'Español', isbn:'', notes:'', location:'cdmx' },
+    { id:'s5', title:'1984', author:'George Orwell', year:1949, genre:'Ciencia ficción', status:'read', rating:5, pages:328, publisher:'Destino', language:'Español', isbn:'', notes:'Distopia brillante.', location:'mixqui' },
+    { id:'s6', title:'Meditaciones', author:'Marco Aurelio', year:161, genre:'Filosofía', status:'read', rating:5, pages:254, publisher:'Gredos', language:'Español', isbn:'', notes:'', location:'mixqui' },
+    { id:'s7', title:'Dune', author:'Frank Herbert', year:1965, genre:'Ciencia ficción', status:'pending', rating:0, pages:688, publisher:'Circulo de Lectores', language:'Español', isbn:'', notes:'', location:'cdmx' },
+    { id:'s8', title:'Pedro Paramo', author:'Juan Rulfo', year:1955, genre:'Ficción', status:'read', rating:5, pages:124, publisher:'FCE', language:'Español', isbn:'', notes:'Breve y perfecta.', location:'cdmx' },
+    { id:'s9', title:'Ficciones', author:'Jorge Luis Borges', year:1944, genre:'Ficción', status:'read', rating:5, pages:174, publisher:'Alianza', language:'Español', isbn:'', notes:'', location:'mixqui' },
+    { id:'s10', title:'La sombra del viento', author:'Carlos Ruiz Zafon', year:2001, genre:'Thriller', status:'read', rating:5, pages:565, publisher:'Planeta', language:'Español', isbn:'', notes:'', location:'cdmx' },
   ];
-  library = samples.map(b => ({ ...b, added: Date.now() - Math.random() * 1e9 }));
-  save();
-  renderAll();
-  showToast('✅ Biblioteca de ejemplo cargada', 'success');
-}
+  const batch = writeBatch(db);
+  samples.forEach(b => batch.set(doc(booksCol(), b.id), { ...b, added: Date.now() }));
+  await batch.commit();
+  showToast('Biblioteca de ejemplo cargada', 'success');
+};
 
-// ==================== RENDER ====================
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll() {
   updateSidebar();
   applyFilters();
@@ -1336,58 +1315,53 @@ function updateStats() {
 function updateSidebar() {
   const counts = { all: library.length, reading: 0, read: 0, pending: 0, wishlist: 0 };
   library.forEach(b => { if (counts[b.status] !== undefined) counts[b.status]++; });
-  document.getElementById('cntAll').textContent = counts.all;
-  document.getElementById('cntReading').textContent = counts.reading;
-  document.getElementById('cntRead').textContent = counts.read;
-  document.getElementById('cntPending').textContent = counts.pending;
-  document.getElementById('cntWishlist').textContent = counts.wishlist;
-
+  ['All','Reading','Read','Pending','Wishlist'].forEach(k => {
+    const el = document.getElementById('cnt' + k);
+    if (el) el.textContent = counts[k.toLowerCase()];
+  });
   document.getElementById('cntCDMX').textContent = library.filter(b => b.location === 'cdmx').length;
   document.getElementById('cntMixqui').textContent = library.filter(b => b.location === 'mixqui').length;
 
   const genreCounts = {};
   library.forEach(b => { if (b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
   const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-
   const gl = document.getElementById('genreList');
-  gl.innerHTML = '';
-  sorted.forEach(([genre, cnt]) => {
-    const color = getGenreColor(genre);
-    const div = document.createElement('div');
-    div.className = 'sidebar-item' + (currentGenreFilter === genre ? ' active' : '');
-    div.innerHTML = `<span class="genre-dot" style="background:${color}"></span>${genre}<span class="count">${cnt}</span>`;
-    div.onclick = () => setGenreFilter(genre, div);
-    gl.appendChild(div);
-  });
-
-  // datalist
+  if (gl) {
+    gl.innerHTML = '';
+    sorted.forEach(([genre, cnt]) => {
+      const color = getGenreColor(genre);
+      const div = document.createElement('div');
+      div.className = 'sidebar-item' + (currentGenreFilter === genre ? ' active' : '');
+      div.innerHTML = `<span class="genre-dot" style="background:${color}"></span>${genre}<span class="count">${cnt}</span>`;
+      div.onclick = () => setGenreFilter(genre, div);
+      gl.appendChild(div);
+    });
+  }
   const dl = document.getElementById('genreDatalist');
-  dl.innerHTML = sorted.map(([g]) => `<option value="${g}">`).join('');
+  if (dl) dl.innerHTML = sorted.map(([g]) => `<option value="${g}">`).join('');
 }
 
 function getFiltered() {
   let books = [...library];
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
   if (q) books = books.filter(b =>
-    b.title.toLowerCase().includes(q) ||
-    b.author.toLowerCase().includes(q) ||
+    (b.title||'').toLowerCase().includes(q) ||
+    (b.author||'').toLowerCase().includes(q) ||
     (b.isbn && b.isbn.includes(q)) ||
-    (b.genre && b.genre.toLowerCase().includes(q)) ||
-    (b.publisher && b.publisher.toLowerCase().includes(q))
+    (b.genre && b.genre.toLowerCase().includes(q))
   );
   if (currentFilter !== 'all') books = books.filter(b => b.status === currentFilter);
   if (currentGenreFilter) books = books.filter(b => b.genre === currentGenreFilter);
   if (currentLocationFilter) books = books.filter(b => b.location === currentLocationFilter);
-
-  const sort = document.getElementById('sortSelect').value;
+  const sort = (document.getElementById('sortSelect') || {}).value || 'title';
   books.sort((a, b) => {
-    if (sort === 'title') return a.title.localeCompare(b.title);
-    if (sort === 'title_desc') return b.title.localeCompare(a.title);
-    if (sort === 'author') return a.author.localeCompare(b.author);
-    if (sort === 'year_desc') return (b.year || 0) - (a.year || 0);
-    if (sort === 'year_asc') return (a.year || 0) - (b.year || 0);
-    if (sort === 'rating_desc') return (b.rating || 0) - (a.rating || 0);
-    if (sort === 'added') return (b.added || 0) - (a.added || 0);
+    if (sort === 'title') return (a.title||'').localeCompare(b.title||'');
+    if (sort === 'title_desc') return (b.title||'').localeCompare(a.title||'');
+    if (sort === 'author') return (a.author||'').localeCompare(b.author||'');
+    if (sort === 'year_desc') return (b.year||0) - (a.year||0);
+    if (sort === 'year_asc') return (a.year||0) - (b.year||0);
+    if (sort === 'rating_desc') return (b.rating||0) - (a.rating||0);
+    if (sort === 'added') return (b.added||0) - (a.added||0);
     return 0;
   });
   return books;
@@ -1395,98 +1369,84 @@ function getFiltered() {
 
 function applyFilters() {
   const books = getFiltered();
-  const total = library.length;
-  const info = document.getElementById('resultsInfo');
-  info.innerHTML = `Mostrando <span>${books.length}</span> de <span>${total}</span> libros`;
-
+  const ri = document.getElementById('resultsInfo');
+  if (ri) ri.innerHTML = `Mostrando <span>${books.length}</span> de <span>${library.length}</span> libros`;
   const container = document.getElementById('booksContainer');
+  if (!container) return;
   if (books.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>No se encontraron libros</h3><p>Prueba con otros filtros o <a href="#" onclick="openAddModal()" style="color:var(--accent)">añade un libro</a>.</p></div>`;
+    container.innerHTML = library.length === 0
+      ? `<div class="empty-state"><div class="icon">📭</div><h3>Tu biblioteca está vacía</h3>
+         <p style="margin-bottom:1.5rem">Empieza añadiendo libros, o carga unos de ejemplo.</p>
+         <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+           <button class="btn btn-primary" onclick="openAddModal()">+ Añadir primer libro</button>
+           <button class="btn" onclick="loadSamples()">📖 Cargar ejemplos</button>
+         </div></div>`
+      : `<div class="empty-state"><div class="icon">📭</div><h3>No se encontraron libros</h3><p>Prueba con otros filtros.</p></div>`;
     return;
   }
-
   if (currentView === 'grid') renderGrid(books, container);
   else renderList(books, container);
 }
 
-function starsHTML(rating) {
-  return [1,2,3,4,5].map(i => `<span class="star ${i <= rating ? 'filled' : ''}">★</span>`).join('');
-}
+const STATUS_LABELS = { read:'Leído', reading:'Leyendo', pending:'Pendiente', wishlist:'Deseos' };
+const STATUS_BADGES = { read:'badge-read', reading:'badge-reading', pending:'badge-pending', wishlist:'badge-wishlist' };
+function starsHTML(r) { return [1,2,3,4,5].map(i=>`<span class="star ${i<=r?'filled':''}">★</span>`).join(''); }
 
-const STATUS_LABELS = { read: 'Leído', reading: 'Leyendo', pending: 'Pendiente', wishlist: 'Deseos' };
-const STATUS_BADGES = { read: 'badge-read', reading: 'badge-reading', pending: 'badge-pending', wishlist: 'badge-wishlist' };
-
-// ==================== COVER IMAGES ====================
-// Uses Open Library Search API (no key needed)
-// Stores coverUrl on each book object, persisted to localStorage
-
+// ── COVERS ────────────────────────────────────────────────────────────────────
 async function fetchCover(book) {
-  if (book.coverUrl || book.coverUrl === null) return; // already tried
-  book.coverUrl = null; // mark as attempted
+  if (book.coverUrl || book.coverUrl === null) return;
+  book.coverUrl = null;
   try {
     const q = encodeURIComponent(`${book.title} ${book.author}`);
-    const res = await fetch(`https://openlibrary.org/search.json?q=${q}&limit=5&fields=cover_i,title`);
+    const res = await fetch(`https://openlibrary.org/search.json?q=${q}&limit=5&fields=cover_i`);
     if (!res.ok) return;
     const data = await res.json();
-    const hit = data.docs?.find(d => d.cover_i);
-    if (hit?.cover_i) {
+    const hit = data.docs && data.docs.find(d => d.cover_i);
+    if (hit && hit.cover_i) {
       book.coverUrl = `https://covers.openlibrary.org/b/id/${hit.cover_i}-M.jpg`;
-      save();
-      // update any visible card
+      if (currentUser) setDoc(doc(booksCol(), String(book.id)), { coverUrl: book.coverUrl }, { merge: true });
       const card = document.querySelector(`[data-book-id="${book.id}"] .book-cover`);
       if (card) applyCoverToEl(card, book.coverUrl);
-      // update detail panel if open
-      const detailCover = document.querySelector('.detail-cover');
-      if (detailCover && selectedBookId === book.id) applyCoverToEl(detailCover, book.coverUrl);
+      const dc = document.querySelector('.detail-cover');
+      if (dc && String(selectedBookId) === String(book.id)) applyCoverToEl(dc, book.coverUrl);
     }
-  } catch(e) { /* network error — leave as null */ }
+  } catch(e) {}
 }
 
 function applyCoverToEl(el, url) {
-  // Remove spinner if present
-  el.querySelector('.cover-spinner')?.remove();
-  if (!url) return;
-  if (el.querySelector('img.cover-img')) return; // already set
+  const sp = el.querySelector('.cover-spinner');
+  if (sp) sp.remove();
+  if (!url || el.querySelector('img.cover-img')) return;
   const img = document.createElement('img');
-  img.className = 'cover-img';
-  img.src = url;
-  img.loading = 'lazy';
-  img.onerror = () => img.remove(); // fallback to illustrated cover
+  img.className = 'cover-img'; img.src = url; img.loading = 'lazy';
+  img.onerror = () => img.remove();
   el.classList.add('has-cover');
   el.prepend(img);
 }
 
 function ensureCovers(books) {
-  // Fetch covers for books that don't have one yet, with a small delay between calls
-  const missing = books.filter(b => b.coverUrl === undefined);
-  missing.forEach((b, i) => {
-    setTimeout(() => fetchCover(b), i * 180);
-  });
+  books.filter(b => b.coverUrl === undefined).forEach((b, i) => setTimeout(() => fetchCover(b), i * 200));
 }
 
 function coverHTML(book) {
-  if (book.coverUrl) {
-    return `<img class="cover-img" src="${book.coverUrl}" loading="lazy" onerror="this.remove()" alt="">`;
-  }
-  if (book.coverUrl === undefined) {
-    return `<span class="cover-spinner">⏳</span>`;
-  }
-  return ''; // coverUrl===null means tried and failed — show illustrated fallback
+  if (book.coverUrl) return `<img class="cover-img" src="${book.coverUrl}" loading="lazy" onerror="this.remove()" alt="">`;
+  if (book.coverUrl === undefined) return `<span class="cover-spinner">⏳</span>`;
+  return '';
 }
 
+// ── GRID ──────────────────────────────────────────────────────────────────────
 function renderGrid(books, container) {
   container.className = 'books-grid';
   container.innerHTML = books.map(b => {
     const color = getGenreColor(b.genre);
-    return `
-    <div class="book-card" onclick="showDetail(${b.id})" data-book-id="${b.id}">
-      <div class="book-cover${b.coverUrl ? ' has-cover' : ''}" style="background:linear-gradient(135deg,${color}22,${color}44);color:${color}">
+    return `<div class="book-card" onclick="showDetail('${b.id}')" data-book-id="${b.id}">
+      <div class="book-cover${b.coverUrl?' has-cover':''}" style="background:linear-gradient(135deg,${color}22,${color}44);color:${color}">
         ${coverHTML(b)}
         <div class="book-cover-spine" style="background:${color}"></div>
-        <div class="book-cover-text" style="${b.coverUrl ? 'opacity:0' : ''}">${b.title}</div>
+        <div class="book-cover-text" style="${b.coverUrl?'opacity:0':''}">${b.title}</div>
       </div>
       <div class="book-badge ${STATUS_BADGES[b.status]}">${STATUS_LABELS[b.status]}</div>
-      ${b.location ? `<div class="loc-badge loc-${b.location}">${b.location === 'cdmx' ? '🏙 CDMX' : '🌿 Mixqui'}</div>` : ''}
+      ${b.location?`<div class="loc-badge loc-${b.location}">${b.location==='cdmx'?'🏙 CDMX':'🌿 Mixqui'}</div>`:''}
       <div class="book-info">
         <div class="book-title">${b.title}</div>
         <div class="book-author">${b.author}</div>
@@ -1496,111 +1456,94 @@ function renderGrid(books, container) {
   ensureCovers(books);
 }
 
+// ── LIST ──────────────────────────────────────────────────────────────────────
 function renderList(books, container) {
   container.className = 'books-list';
   container.innerHTML = books.map(b => {
     const color = getGenreColor(b.genre);
-    return `
-    <div class="book-row" onclick="showDetail(${b.id})">
+    return `<div class="book-row" onclick="showDetail('${b.id}')">
       <div class="book-row-color" style="background:${color}"></div>
-      <div class="book-row-title">
-        <div class="t">${b.title}</div>
-        <div class="a">${b.author}</div>
-      </div>
-      <div class="book-row-genre">${b.genre || '—'}</div>
-      <div class="book-row-year">${b.year || '—'}</div>
-      <div class="book-row-rating">${starsHTML(b.rating)}</div>
+      <div class="book-row-title"><div class="t">${b.title}</div><div class="a">${b.author}</div></div>
+      <div class="book-row-genre">${b.genre||'—'}</div>
+      <div class="book-row-year">${b.year||'—'}</div>
+      <div class="book-row-rating">${starsHTML(b.rating||0)}</div>
       <div class="book-row-status"><span class="book-badge ${STATUS_BADGES[b.status]}">${STATUS_LABELS[b.status]}</span></div>
-      <div style="width:80px;text-align:center">${b.location ? `<span class="loc-badge loc-${b.location}" style="position:static;display:inline-block">${b.location === 'cdmx' ? '🏙 CDMX' : '🌿 Mixqui'}</span>` : '<span style="color:var(--text3);font-size:0.75rem">—</span>'}</div>
+      <div style="width:80px;text-align:center">${b.location?`<span class="loc-badge loc-${b.location}" style="position:static;display:inline-block">${b.location==='cdmx'?'🏙 CDMX':'🌿 Mixqui'}</span>`:'<span style="color:var(--text3);font-size:.75rem">—</span>'}</div>
     </div>`;
   }).join('');
 }
 
-// ==================== DETAIL ====================
-function showDetail(id) {
-  const b = library.find(x => x.id === id);
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+window.showDetail = function(id) {
+  const b = library.find(x => String(x.id) === String(id));
   if (!b) return;
   selectedBookId = id;
   const color = getGenreColor(b.genre);
-  const panel = document.getElementById('detailPanel');
   document.getElementById('detailContent').innerHTML = `
     <div class="detail-cover" style="background:linear-gradient(135deg,${color}22,${color}44);color:${color}">
-      ${b.coverUrl ? `<img class="cover-img" src="${b.coverUrl}" loading="lazy" onerror="this.remove()" alt="">` : ''}
-      <span style="font-style:italic;position:relative;z-index:1;${b.coverUrl ? 'opacity:0' : ''}">${b.title}</span>
+      ${b.coverUrl?`<img class="cover-img" src="${b.coverUrl}" loading="lazy" onerror="this.remove()" alt="">`:''}
+      <span style="font-style:italic;position:relative;z-index:1;${b.coverUrl?'opacity:0':''}">${b.title}</span>
     </div>
     <div class="detail-title">${b.title}</div>
     <div class="detail-author">${b.author}</div>
     <div class="detail-meta">
-      ${b.genre ? `<span class="detail-tag" style="border-color:${color};color:${color}">${b.genre}</span>` : ''}
+      ${b.genre?`<span class="detail-tag" style="border-color:${color};color:${color}">${b.genre}</span>`:''}
       <span class="detail-tag ${STATUS_BADGES[b.status]}">${STATUS_LABELS[b.status]}</span>
-      ${b.year ? `<span class="detail-tag">${b.year}</span>` : ''}
-      ${b.language ? `<span class="detail-tag">${b.language}</span>` : ''}
-      ${b.location ? `<span class="detail-tag loc-badge loc-${b.location}" style="position:static;display:inline-block">${b.location === 'cdmx' ? '🏙 CDMX' : '🌿 Mixqui'}</span>` : ''}
+      ${b.year?`<span class="detail-tag">${b.year}`:''}${b.year?'</span>':''}
+      ${b.language?`<span class="detail-tag">${b.language}</span>`:''}
+      ${b.location?`<span class="detail-tag loc-badge loc-${b.location}" style="position:static;display:inline-block">${b.location==='cdmx'?'🏙 CDMX':'🌿 Mixqui'}</span>`:''}
     </div>
-    ${b.rating ? `<div class="detail-section"><div class="detail-section-label">Puntuación</div><div>${starsHTML(b.rating)}</div></div>` : ''}
-    ${b.pages ? `<div class="detail-section"><div class="detail-section-label">Páginas</div><div class="detail-section-value">${b.pages}</div></div>` : ''}
-    ${b.publisher ? `<div class="detail-section"><div class="detail-section-label">Editorial</div><div class="detail-section-value">${b.publisher}</div></div>` : ''}
-    ${b.isbn ? `<div class="detail-section"><div class="detail-section-label">ISBN</div><div class="detail-section-value" style="font-family:'DM Mono',monospace;font-size:0.8rem">${b.isbn}</div></div>` : ''}
-    ${b.notes ? `<div class="detail-section"><div class="detail-section-label">Notas</div><div class="detail-section-value">${b.notes}</div></div>` : ''}
+    ${b.rating?`<div class="detail-section"><div class="detail-section-label">Puntuación</div><div>${starsHTML(b.rating)}</div></div>`:''}
+    ${b.pages?`<div class="detail-section"><div class="detail-section-label">Páginas</div><div class="detail-section-value">${b.pages}</div></div>`:''}
+    ${b.publisher?`<div class="detail-section"><div class="detail-section-label">Editorial</div><div class="detail-section-value">${b.publisher}</div></div>`:''}
+    ${b.isbn?`<div class="detail-section"><div class="detail-section-label">ISBN</div><div class="detail-section-value" style="font-family:'DM Mono',monospace;font-size:.8rem">${b.isbn}</div></div>`:''}
+    ${b.notes?`<div class="detail-section"><div class="detail-section-label">Notas</div><div class="detail-section-value">${b.notes}</div></div>`:''}
     <div class="detail-actions">
-      <button class="btn" onclick="openEditModal(${b.id})">✏️ Editar</button>
-      <button class="btn btn-danger" onclick="confirmDelete(${b.id})">🗑</button>
-    </div>
-  `;
-  panel.classList.add('open');
-}
+      <button class="btn" onclick="openEditModal('${b.id}')">✏️ Editar</button>
+      <button class="btn btn-danger" onclick="confirmDelete('${b.id}')">🗑</button>
+    </div>`;
+  document.getElementById('detailPanel').classList.add('open');
+};
 
-function closeDetail() {
+window.closeDetail = function() {
   document.getElementById('detailPanel').classList.remove('open');
   selectedBookId = null;
-}
+};
 
-// ==================== MODAL ====================
-function openAddModal() {
-  editingId = null;
-  currentRating = 0;
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+window.openAddModal = function() {
+  editingId = null; currentRating = 0;
   document.getElementById('modalTitle').textContent = 'Añadir libro';
-  ['fTitle','fAuthor','fISBN','fPublisher','fNotes','fGenre','fLanguage'].forEach(id => document.getElementById(id).value = '');
+  ['fTitle','fAuthor','fISBN','fPublisher','fNotes','fGenre','fLanguage'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('fYear').value = '';
   document.getElementById('fPages').value = '';
   document.getElementById('fStatus').value = 'pending';
-  currentLocation = '';
-  setLocation('');
-  updateStarUI();
+  currentLocation = ''; setLocation(''); updateStarUI();
   document.getElementById('addModal').classList.add('open');
   setTimeout(() => document.getElementById('fTitle').focus(), 100);
-}
+};
 
-function openEditModal(id) {
-  const b = library.find(x => x.id === id);
+window.openEditModal = function(id) {
+  const b = library.find(x => String(x.id) === String(id));
   if (!b) return;
-  editingId = id;
-  currentRating = b.rating || 0;
+  editingId = id; currentRating = b.rating || 0;
   document.getElementById('modalTitle').textContent = 'Editar libro';
-  document.getElementById('fTitle').value = b.title;
-  document.getElementById('fAuthor').value = b.author;
+  document.getElementById('fTitle').value = b.title || '';
+  document.getElementById('fAuthor').value = b.author || '';
   document.getElementById('fYear').value = b.year || '';
   document.getElementById('fGenre').value = b.genre || '';
-  document.getElementById('fStatus').value = b.status;
+  document.getElementById('fStatus').value = b.status || 'pending';
   document.getElementById('fISBN').value = b.isbn || '';
   document.getElementById('fPublisher').value = b.publisher || '';
   document.getElementById('fPages').value = b.pages || '';
   document.getElementById('fLanguage').value = b.language || '';
   document.getElementById('fNotes').value = b.notes || '';
-  currentLocation = b.location || '';
-  setLocation(currentLocation);
-  updateStarUI();
+  currentLocation = b.location || ''; setLocation(currentLocation); updateStarUI();
   document.getElementById('addModal').classList.add('open');
-}
+};
 
-function closeModal() {
-  document.getElementById('addModal').classList.remove('open');
-}
-
-function setRating(v) {
-  currentRating = v;
-  updateStarUI();
-}
+window.closeModal = function() { document.getElementById('addModal').classList.remove('open'); };
+window.setRating = function(v) { currentRating = v; updateStarUI(); };
 
 function updateStarUI() {
   document.querySelectorAll('.star-input').forEach(s => {
@@ -1608,21 +1551,22 @@ function updateStarUI() {
   });
 }
 
-function setLocation(v) {
+window.setLocation = function(v) {
   currentLocation = v;
-  document.getElementById('locOptCDMX').className = 'loc-option' + (v === 'cdmx' ? ' selected-cdmx' : '');
-  document.getElementById('locOptMixqui').className = 'loc-option' + (v === 'mixqui' ? ' selected-mixqui' : '');
-  document.getElementById('locOptNone').className = 'loc-option' + (v === '' ? ' selected-none' : '');
-}
+  const c = document.getElementById('locOptCDMX');
+  const m = document.getElementById('locOptMixqui');
+  const n = document.getElementById('locOptNone');
+  if (c) c.className = 'loc-option' + (v==='cdmx'?' selected-cdmx':'');
+  if (m) m.className = 'loc-option' + (v==='mixqui'?' selected-mixqui':'');
+  if (n) n.className = 'loc-option' + (v===''?' selected-none':'');
+};
 
-function saveBook() {
+window.saveBook = async function() {
   const title = document.getElementById('fTitle').value.trim();
   const author = document.getElementById('fAuthor').value.trim();
-  if (!title || !author) { showToast('⚠️ Título y autor son obligatorios', 'error'); return; }
-
+  if (!title || !author) { showToast('Título y autor son obligatorios', 'error'); return; }
   const data = {
-    title,
-    author,
+    title, author,
     year: parseInt(document.getElementById('fYear').value) || null,
     genre: document.getElementById('fGenre').value.trim(),
     status: document.getElementById('fStatus').value,
@@ -1634,494 +1578,274 @@ function saveBook() {
     rating: currentRating,
     location: currentLocation,
   };
-
   if (editingId) {
-    const idx = library.findIndex(b => b.id === editingId);
-    const prev = library[idx];
-    // reset cover if title or author changed
-    if (prev.title !== data.title || prev.author !== data.author) {
-      data.coverUrl = undefined;
-    }
-    library[idx] = { ...prev, ...data };
-    showToast('✅ Libro actualizado', 'success');
-    if (selectedBookId === editingId) showDetail(editingId);
+    const prev = library.find(b => String(b.id) === String(editingId)) || {};
+    if (prev.title !== data.title || prev.author !== data.author) data.coverUrl = undefined;
+    await saveToCloud({ ...prev, ...data, id: String(editingId) });
+    showToast('Libro actualizado', 'success');
+    if (String(selectedBookId) === String(editingId)) showDetail(editingId);
   } else {
-    const newId = Date.now();
-    library.unshift({ id: newId, ...data, added: Date.now() });
-    showToast('✅ Libro añadido a la biblioteca', 'success');
+    const newId = String(Date.now());
+    await saveToCloud({ id: newId, ...data, added: Date.now() });
+    showToast('Libro añadido a la biblioteca', 'success');
   }
-
-  save();
   closeModal();
-  renderAll();
-}
+};
 
-// ==================== DELETE ====================
-function confirmDelete(id) {
-  const b = library.find(x => x.id === id);
-  document.querySelector('#confirmModal p').textContent = `¿Eliminar "${b.title}"? Esta acción no se puede deshacer.`;
+// ── DELETE ────────────────────────────────────────────────────────────────────
+window.confirmDelete = function(id) {
+  const b = library.find(x => String(x.id) === String(id));
+  document.querySelector('#confirmModal p').textContent = `¿Eliminar "${b && b.title}"? Esta acción no se puede deshacer.`;
   document.getElementById('confirmDeleteBtn').onclick = () => deleteBook(id);
   document.getElementById('confirmModal').classList.add('open');
-}
+};
 
-function deleteBook(id) {
-  library = library.filter(b => b.id !== id);
-  save();
+async function deleteBook(id) {
+  await deleteFromCloud(id);
   document.getElementById('confirmModal').classList.remove('open');
-  if (selectedBookId === id) closeDetail();
-  renderAll();
-  showToast('🗑 Libro eliminado', 'success');
+  if (String(selectedBookId) === String(id)) closeDetail();
+  showToast('Libro eliminado', 'success');
 }
 
-// ==================== FILTERS ====================
-function setFilter(filter, el) {
-  currentFilter = filter;
-  currentGenreFilter = null;
-  currentLocationFilter = null;
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+window.setFilter = function(filter, el) {
+  currentFilter = filter; currentGenreFilter = null; currentLocationFilter = null;
   document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.toggle('active', b.id === 'bnav-' + filter));
   el.classList.add('active');
   applyFilters();
-}
+};
 
 function setGenreFilter(genre, el) {
   if (currentGenreFilter === genre) {
-    currentGenreFilter = null;
-    el.classList.remove('active');
-    document.querySelector('[data-filter="all"]').classList.add('active');
+    currentGenreFilter = null; el.classList.remove('active');
+    const allEl = document.querySelector('[data-filter="all"]');
+    if (allEl) allEl.classList.add('active');
     currentFilter = 'all';
   } else {
-    currentGenreFilter = genre;
-    currentFilter = 'all';
-    currentLocationFilter = null;
+    currentGenreFilter = genre; currentFilter = 'all'; currentLocationFilter = null;
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
   }
   applyFilters();
 }
 
-function setLocationFilter(loc, el) {
+window.setLocationFilter = function(loc, el) {
   if (currentLocationFilter === loc) {
-    currentLocationFilter = null;
-    el.classList.remove('active');
-    document.querySelector('[data-filter="all"]').classList.add('active');
+    currentLocationFilter = null; el.classList.remove('active');
+    const allEl = document.querySelector('[data-filter="all"]');
+    if (allEl) allEl.classList.add('active');
     currentFilter = 'all';
   } else {
-    currentLocationFilter = loc;
-    currentFilter = 'all';
-    currentGenreFilter = null;
+    currentLocationFilter = loc; currentFilter = 'all'; currentGenreFilter = null;
     document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
   }
   applyFilters();
-}
+};
 
-// ==================== VIEW ====================
-function setView(v) {
+window.setView = function(v) {
   currentView = v;
-  document.getElementById('gridBtn').classList.toggle('active', v === 'grid');
-  document.getElementById('listBtn').classList.toggle('active', v === 'list');
+  const g = document.getElementById('gridBtn');
+  const l = document.getElementById('listBtn');
+  if (g) g.classList.toggle('active', v === 'grid');
+  if (l) l.classList.toggle('active', v === 'list');
   applyFilters();
-}
+};
 
-// ==================== TOAST ====================
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+window.exportCSV = function() {
+  if (!library.length) { showToast('No hay libros para exportar', 'error'); return; }
+  const SE = { read:'leído', reading:'leyendo', pending:'pendiente', wishlist:'deseos' };
+  const hdr = 'titulo,autor,año,genero,estado,ubicacion,paginas,editorial,idioma,isbn,puntuacion,notas';
+  const esc = v => { const s=(v??'').toString(); return (s.includes(',')||s.includes('"'))?`"${s.replace(/"/g,'""')}"`:`${s}`; };
+  const rows = library.map(b => [esc(b.title),esc(b.author),esc(b.year||''),esc(b.genre),esc(SE[b.status]||b.status),esc(b.location),esc(b.pages||''),esc(b.publisher),esc(b.language),esc(b.isbn),esc(b.rating||''),esc(b.notes)].join(','));
+  const blob = new Blob(['\uFEFF'+[hdr,...rows].join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `mi_biblioteca_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast(`${library.length} libros exportados`, 'success');
+};
 
-// ==================== CSV IMPORT ====================
+// ── CSV IMPORT ────────────────────────────────────────────────────────────────
 let csvParsedBooks = [];
 
-function openCSVModal() {
+window.openCSVModal = function() {
   csvParsedBooks = [];
   document.getElementById('csvPreview').style.display = 'none';
   document.getElementById('csvImportBtn').style.display = 'none';
-  document.getElementById('csvFileInput').value = '';
+  const fi = document.getElementById('csvFileInput');
+  if (fi) fi.value = '';
   resetDropZone();
   document.getElementById('csvModal').classList.add('open');
-}
+};
 
-function closeCSVModal() {
-  document.getElementById('csvModal').classList.remove('open');
-}
+window.closeCSVModal = function() { document.getElementById('csvModal').classList.remove('open'); };
 
 function resetDropZone() {
   const dz = document.getElementById('csvDropZone');
-  dz.style.borderColor = 'var(--border2)';
-  dz.style.background = 'var(--surface2)';
-  dz.innerHTML = `
-    <div style="font-size:2rem;margin-bottom:0.5rem">📄</div>
-    <div style="font-family:'Lora',serif;font-style:italic;color:var(--text2);font-size:1rem;margin-bottom:0.25rem">Arrastra tu archivo CSV aquí</div>
-    <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text3)">o haz clic para seleccionar</div>
-    <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none" onchange="csvFileSelected(event)">
-  `;
+  if (!dz) return;
+  dz.style.borderColor = 'var(--border2)'; dz.style.background = 'var(--surface2)';
+  dz.innerHTML = `<div style="font-size:2rem;margin-bottom:.5rem">📄</div>
+    <div style="font-family:'Lora',serif;font-style:italic;color:var(--text2);font-size:1rem;margin-bottom:.25rem">Arrastra tu archivo CSV aquí</div>
+    <div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text3)">o haz clic para seleccionar</div>
+    <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none" onchange="csvFileSelected(event)">`;
 }
 
-function csvDragOver(e) {
-  e.preventDefault();
-  const dz = document.getElementById('csvDropZone');
-  dz.style.borderColor = 'var(--accent)';
-  dz.style.background = 'var(--accent-soft)';
-}
-
-function csvDragLeave(e) {
-  const dz = document.getElementById('csvDropZone');
-  dz.style.borderColor = 'var(--border2)';
-  dz.style.background = 'var(--surface2)';
-}
-
-function csvDrop(e) {
-  e.preventDefault();
-  csvDragLeave(e);
-  const file = e.dataTransfer.files[0];
-  if (file) processCSVFile(file);
-}
-
-function csvFileSelected(e) {
-  const file = e.target.files[0];
-  if (file) processCSVFile(file);
-}
+window.csvDragOver = function(e) { e.preventDefault(); const dz=document.getElementById('csvDropZone'); dz.style.borderColor='var(--accent)'; dz.style.background='var(--accent-soft)'; };
+window.csvDragLeave = function(e) { const dz=document.getElementById('csvDropZone'); dz.style.borderColor='var(--border2)'; dz.style.background='var(--surface2)'; };
+window.csvDrop = function(e) { e.preventDefault(); csvDragLeave(e); const f=e.dataTransfer.files[0]; if(f) processCSVFile(f); };
+window.csvFileSelected = function(e) { const f=e.target.files[0]; if(f) processCSVFile(f); };
 
 function processCSVFile(file) {
-  if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
-    showToast('⚠️ El archivo debe ser .csv', 'error');
-    return;
-  }
   const dz = document.getElementById('csvDropZone');
-  dz.style.borderColor = 'var(--green)';
-  dz.style.background = 'rgba(90,138,90,0.06)';
-  dz.innerHTML = `<div style="font-size:1.5rem">✅</div><div style="font-family:'Lora',serif;font-style:italic;color:var(--text2);font-size:0.95rem;margin-top:0.3rem">${file.name}</div>`;
-
-  const reader = new FileReader();
-  reader.onload = (e) => parseCSV(e.target.result);
-  reader.readAsText(file, 'UTF-8');
+  dz.style.borderColor='var(--green)'; dz.style.background='rgba(90,138,90,.06)';
+  dz.innerHTML=`<div style="font-size:1.5rem">✅</div><div style="font-family:'Lora',serif;color:var(--text2);margin-top:.3rem">${file.name}</div>`;
+  const reader=new FileReader(); reader.onload=e=>parseCSV(e.target.result); reader.readAsText(file,'UTF-8');
 }
 
-// Map of CSV column names -> internal field names
-const COL_MAP = {
-  titulo: 'title', title: 'title',
-  autor: 'author', author: 'author',
-  año: 'year', anio: 'year', year: 'year',
-  genero: 'genre', género: 'genre', genre: 'genre',
-  estado: 'status', status: 'status',
-  ubicacion: 'location', ubicación: 'location', location: 'location',
-  paginas: 'pages', páginas: 'pages', pages: 'pages',
-  editorial: 'publisher', publisher: 'publisher',
-  idioma: 'language', language: 'language',
-  isbn: 'isbn',
-  puntuacion: 'rating', puntuación: 'rating', rating: 'rating',
-  notas: 'notes', notes: 'notes',
-};
-
-const STATUS_MAP = {
-  leído: 'read', leido: 'read', read: 'read', '✅': 'read',
-  leyendo: 'reading', reading: 'reading', '📖': 'reading',
-  pendiente: 'pending', pending: 'pending', '⏳': 'pending',
-  deseos: 'wishlist', wishlist: 'wishlist', 'lista de deseos': 'wishlist', '⭐': 'wishlist',
-};
-
-const LOC_MAP = {
-  cdmx: 'cdmx', 'ciudad de méxico': 'cdmx', 'ciudad de mexico': 'cdmx',
-  mixqui: 'mixqui',
-};
+const COL_MAP={titulo:'title',title:'title',autor:'author',author:'author','año':'year',anio:'year',year:'year',genero:'genre',genre:'genre',estado:'status',status:'status',ubicacion:'location',location:'location',paginas:'pages',pages:'pages',editorial:'publisher',publisher:'publisher',idioma:'language',language:'language',isbn:'isbn',puntuacion:'rating',rating:'rating',notas:'notes',notes:'notes'};
+const SMAP={leído:'read',leido:'read',read:'read',leyendo:'reading',reading:'reading',pendiente:'pending',pending:'pending',deseos:'wishlist',wishlist:'wishlist'};
+const LMAP={cdmx:'cdmx',mixqui:'mixqui'};
 
 function parseCSV(text) {
-  // Detect delimiter: comma or semicolon
-  const firstLine = text.split('\n')[0];
-  const delim = (firstLine.match(/;/g) || []).length > (firstLine.match(/,/g) || []).length ? ';' : ',';
-
-  const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
-  if (lines.length < 2) {
-    showToast('⚠️ El CSV está vacío o solo tiene encabezado', 'error');
-    return;
+  const fl=text.split('\n')[0];
+  const delim=(fl.match(/;/g)||[]).length>(fl.match(/,/g)||[]).length?';':',';
+  const lines=text.trim().split('\n').map(l=>l.trim()).filter(l=>l);
+  if(lines.length<2){showToast('CSV vacío','error');return;}
+  const hdrs=splitCSVLine(lines[0],delim).map(h=>h.toLowerCase().trim().replace(/"/g,''));
+  const mh=hdrs.map(h=>COL_MAP[h]||null);
+  const errors=[]; csvParsedBooks=[];
+  for(let i=1;i<lines.length;i++){
+    const vals=splitCSVLine(lines[i],delim);
+    const row={};
+    mh.forEach((f,idx)=>{if(f)row[f]=(vals[idx]||'').trim().replace(/^"|"$/g,'');});
+    if(!row.title){errors.push(`Fila ${i+1}: sin título`);continue;}
+    if(!row.author){errors.push(`Fila ${i+1}: sin autor`);continue;}
+    csvParsedBooks.push({title:row.title,author:row.author,year:parseInt(row.year)||null,genre:row.genre||'',status:SMAP[(row.status||'').toLowerCase()]||'pending',location:LMAP[(row.location||'').toLowerCase()]||'',pages:parseInt(row.pages)||null,publisher:row.publisher||'',language:row.language||'',isbn:row.isbn||'',rating:Math.min(5,Math.max(0,parseInt(row.rating)||0)),notes:row.notes||''});
   }
-
-  // Parse header
-  const headers = splitCSVLine(lines[0], delim).map(h =>
-    h.toLowerCase().trim().replace(/["""]/g, '')
-  );
-
-  const mappedHeaders = headers.map(h => COL_MAP[h] || null);
-
-  const errors = [];
-  csvParsedBooks = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const vals = splitCSVLine(lines[i], delim);
-    const row = {};
-    mappedHeaders.forEach((field, idx) => {
-      if (field) row[field] = (vals[idx] || '').trim().replace(/^[""]|[""]$/g, '');
-    });
-
-    if (!row.title) { errors.push(`Fila ${i + 1}: sin título, omitida.`); continue; }
-    if (!row.author) { errors.push(`Fila ${i + 1}: "${row.title}" sin autor, omitida.`); continue; }
-
-    csvParsedBooks.push({
-      title: row.title,
-      author: row.author,
-      year: parseInt(row.year) || null,
-      genre: row.genre || '',
-      status: STATUS_MAP[(row.status || '').toLowerCase()] || 'pending',
-      location: LOC_MAP[(row.location || '').toLowerCase()] || '',
-      pages: parseInt(row.pages) || null,
-      publisher: row.publisher || '',
-      language: row.language || '',
-      isbn: row.isbn || '',
-      rating: Math.min(5, Math.max(0, parseInt(row.rating) || 0)),
-      notes: row.notes || '',
-    });
-  }
-
-  renderCSVPreview(csvParsedBooks, errors);
+  renderCSVPreview(csvParsedBooks,errors);
 }
 
-function splitCSVLine(line, delim) {
-  // Handles quoted fields
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if ((ch === '"' || ch === '"' || ch === '"') && !inQuotes) { inQuotes = true; }
-    else if ((ch === '"' || ch === '"' || ch === '"') && inQuotes) { inQuotes = false; }
-    else if (ch === delim && !inQuotes) { result.push(current); current = ''; }
-    else { current += ch; }
-  }
-  result.push(current);
-  return result;
+function splitCSVLine(line,delim){
+  const r=[];let c='',q=false;
+  for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'&&!q)q=true;else if(ch==='"'&&q)q=false;else if(ch===delim&&!q){r.push(c);c='';}else c+=ch;}
+  r.push(c);return r;
 }
 
-function renderCSVPreview(books, errors) {
-  const preview = document.getElementById('csvPreview');
-  preview.style.display = 'block';
-
-  document.getElementById('csvPreviewCount').textContent =
-    `${books.length} libro${books.length !== 1 ? 's' : ''} encontrado${books.length !== 1 ? 's' : ''}`;
-
-  const errDiv = document.getElementById('csvErrors');
-  if (errors.length) {
-    errDiv.style.display = 'block';
-    errDiv.innerHTML = '⚠️ ' + errors.join('<br>⚠️ ');
-  } else {
-    errDiv.style.display = 'none';
-  }
-
-  const STATUS_ES = { read: 'Leído', reading: 'Leyendo', pending: 'Pendiente', wishlist: 'Deseos' };
-  const LOC_ES = { cdmx: '🏙 CDMX', mixqui: '🌿 Mixqui', '': '—' };
-
-  const table = document.getElementById('csvPreviewTable');
-  table.innerHTML = `
-    <thead>
-      <tr style="background:var(--surface3);position:sticky;top:0">
-        <th style="padding:0.4rem 0.7rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)">Título</th>
-        <th style="padding:0.4rem 0.7rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)">Autor</th>
-        <th style="padding:0.4rem 0.7rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)">Año</th>
-        <th style="padding:0.4rem 0.7rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)">Estado</th>
-        <th style="padding:0.4rem 0.7rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.65rem;font-weight:400;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--border)">Ubicación</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${books.slice(0, 50).map((b, i) => `
-        <tr style="border-bottom:1px solid var(--border);${i % 2 === 0 ? 'background:var(--surface)' : 'background:var(--surface2)'}">
-          <td style="padding:0.4rem 0.7rem;color:var(--text);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.title}</td>
-          <td style="padding:0.4rem 0.7rem;color:var(--text2);font-style:italic;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.author}</td>
-          <td style="padding:0.4rem 0.7rem;color:var(--text3);font-family:'DM Mono',monospace;font-size:0.75rem">${b.year || '—'}</td>
-          <td style="padding:0.4rem 0.7rem"><span class="book-badge ${STATUS_BADGES[b.status]}" style="position:static;display:inline-block">${STATUS_ES[b.status]}</span></td>
-          <td style="padding:0.4rem 0.7rem;color:var(--text3);font-size:0.82rem">${LOC_ES[b.location]}</td>
-        </tr>
-      `).join('')}
-      ${books.length > 50 ? `<tr><td colspan="5" style="padding:0.5rem 0.7rem;color:var(--text3);font-style:italic;font-size:0.85rem;text-align:center">… y ${books.length - 50} más</td></tr>` : ''}
-    </tbody>
-  `;
-
-  document.getElementById('csvImportBtn').style.display = books.length ? 'flex' : 'none';
+function renderCSVPreview(books,errors){
+  document.getElementById('csvPreview').style.display='block';
+  document.getElementById('csvPreviewCount').textContent=`${books.length} libro${books.length!==1?'s':''} encontrado${books.length!==1?'s':''}`;
+  const ed=document.getElementById('csvErrors');
+  if(errors.length){ed.style.display='block';ed.innerHTML='⚠️ '+errors.join('<br>⚠️ ');}else ed.style.display='none';
+  const SE={read:'Leído',reading:'Leyendo',pending:'Pendiente',wishlist:'Deseos'};
+  const LE={cdmx:'🏙 CDMX',mixqui:'🌿 Mixqui','':'—'};
+  document.getElementById('csvPreviewTable').innerHTML=`<thead><tr style="background:var(--surface3)">
+    <th style="padding:.4rem .7rem;text-align:left;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);border-bottom:1px solid var(--border)">Título</th>
+    <th style="padding:.4rem .7rem;text-align:left;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);border-bottom:1px solid var(--border)">Autor</th>
+    <th style="padding:.4rem .7rem;text-align:left;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);border-bottom:1px solid var(--border)">Estado</th>
+    <th style="padding:.4rem .7rem;text-align:left;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text3);border-bottom:1px solid var(--border)">Ubicación</th>
+  </tr></thead><tbody>${books.slice(0,50).map((b,i)=>`<tr style="border-bottom:1px solid var(--border);background:${i%2===0?'var(--surface)':'var(--surface2)'}">
+    <td style="padding:.4rem .7rem;color:var(--text);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.title}</td>
+    <td style="padding:.4rem .7rem;color:var(--text2);font-style:italic">${b.author}</td>
+    <td style="padding:.4rem .7rem"><span class="book-badge ${STATUS_BADGES[b.status]}" style="position:static;display:inline-block">${SE[b.status]}</span></td>
+    <td style="padding:.4rem .7rem;color:var(--text3)">${LE[b.location||'']}</td>
+  </tr>`).join('')}</tbody>`;
+  document.getElementById('csvImportBtn').style.display=books.length?'flex':'none';
 }
 
-function importCSV() {
-  if (!csvParsedBooks.length) return;
-  const dupMode = document.querySelector('input[name="dupMode"]:checked').value;
-  let added = 0, skipped = 0, overwritten = 0;
-
-  csvParsedBooks.forEach(b => {
-    const key = b.title.toLowerCase() + '||' + b.author.toLowerCase();
-    const existing = library.find(x =>
-      x.title.toLowerCase() + '||' + x.author.toLowerCase() === key
-    );
-
-    if (existing) {
-      if (dupMode === 'skip') { skipped++; return; }
-      if (dupMode === 'overwrite') {
-        Object.assign(existing, b);
-        overwritten++;
-        return;
-      }
-    }
-    library.unshift({ id: Date.now() + Math.random(), ...b, added: Date.now() });
+window.importCSV = async function() {
+  if(!csvParsedBooks.length)return;
+  const dup=document.querySelector('input[name="dupMode"]:checked').value;
+  let added=0,skipped=0,overwritten=0;
+  const batch=writeBatch(db);
+  for(const b of csvParsedBooks){
+    const key=b.title.toLowerCase()+'||'+b.author.toLowerCase();
+    const ex=library.find(x=>((x.title||'').toLowerCase()+'||'+(x.author||'').toLowerCase())===key);
+    if(ex){if(dup==='skip'){skipped++;continue;}if(dup==='overwrite'){batch.set(doc(booksCol(),String(ex.id)),{...ex,...b});overwritten++;continue;}}
+    const id=String(Date.now()+Math.random());
+    batch.set(doc(booksCol(),id),{id,...b,added:Date.now()});
     added++;
-  });
-
-  save();
+  }
+  await batch.commit();
   closeCSVModal();
-  renderAll();
-  // fetch covers for newly imported books
-  ensureCovers(library);
+  let msg=`✅ ${added} libro${added!==1?'s':''} importado${added!==1?'s':''}`;
+  if(overwritten)msg+=`, ${overwritten} actualizado${overwritten!==1?'s':''}`;
+  if(skipped)msg+=`, ${skipped} omitido${skipped!==1?'s':''}`;
+  showToast(msg,'success');
+};
 
-  let msg = `✅ ${added} libro${added !== 1 ? 's' : ''} importado${added !== 1 ? 's' : ''}`;
-  if (overwritten) msg += `, ${overwritten} actualizado${overwritten !== 1 ? 's' : ''}`;
-  if (skipped) msg += `, ${skipped} omitido${skipped !== 1 ? 's' : ''}`;
-  showToast(msg, 'success');
+window.downloadCSVTemplate = function() {
+  const hdr='titulo,autor,año,genero,estado,ubicacion,paginas,editorial,idioma,isbn,puntuacion,notas';
+  const ex='"Cien anos de soledad","Gabriel Garcia Marquez",1967,Ficcion,leido,cdmx,471,Editorial Sudamericana,Español,,5,"Una obra maestra"';
+  const blob=new Blob([hdr+'\n'+ex],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='plantilla_biblioteca.csv';a.click();
+};
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const t=document.getElementById('toast');
+  if(!t)return;
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-function exportCSV() {
-  if (!library.length) { showToast('⚠️ No hay libros para exportar', 'error'); return; }
-
-  const STATUS_ES = { read: 'leído', reading: 'leyendo', pending: 'pendiente', wishlist: 'deseos' };
-  const header = 'titulo,autor,año,genero,estado,ubicacion,paginas,editorial,idioma,isbn,puntuacion,notas';
-
-  const rows = library.map(b => {
-    const esc = v => {
-      const s = (v ?? '').toString();
-      return s.includes(',') || s.includes('"') || s.includes('\n')
-        ? `"${s.replace(/"/g, '""')}"` : s;
-    };
-    return [
-      esc(b.title), esc(b.author), esc(b.year || ''),
-      esc(b.genre), esc(STATUS_ES[b.status] || b.status),
-      esc(b.location), esc(b.pages || ''), esc(b.publisher),
-      esc(b.language), esc(b.isbn), esc(b.rating || ''), esc(b.notes)
-    ].join(',');
-  });
-
-  const csv = [header, ...rows].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  const date = new Date().toISOString().slice(0,10);
-  a.download = `mi_biblioteca_${date}.csv`;
-  a.click();
-  showToast(`✅ ${library.length} libros exportados`, 'success');
-}
-
-function downloadCSVTemplate() {
-  const header = 'titulo,autor,año,genero,estado,ubicacion,paginas,editorial,idioma,isbn,puntuacion,notas';
-  const example = '"Cien años de soledad","Gabriel García Márquez",1967,Ficción,leído,cdmx,471,Editorial Sudamericana,Español,,5,"Una obra maestra"';
-  const blob = new Blob([header + '\n' + example], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'plantilla_biblioteca.csv';
-  a.click();
-}
-
-// ==================== KEYBOARD ====================
+// ── KEYBOARD & MODAL CLOSE ────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    closeModal();
-    closeCSVModal();
+  if(e.key==='Escape'){
+    closeModal(); closeCSVModal();
     document.getElementById('confirmModal').classList.remove('open');
     closeDetail();
   }
 });
-
-// Close modal on overlay click
-document.getElementById('addModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('addModal')) closeModal();
-});
-document.getElementById('confirmModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('confirmModal')) document.getElementById('confirmModal').classList.remove('open');
-});
-document.getElementById('csvModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('csvModal')) closeCSVModal();
+['addModal','confirmModal','csvModal'].forEach(id => {
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
 });
 
-// ==================== INIT ====================
-if (library.length === 0) {
-  // Show empty with option to load samples
-  document.getElementById('booksContainer').innerHTML = `
-    <div class="empty-state">
-      <div class="icon">📚</div>
-      <h3>Tu biblioteca está vacía</h3>
-      <p style="margin-bottom:1.5rem">Empieza añadiendo tus libros manualmente, o carga unos libros de ejemplo.</p>
-      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="openAddModal()">+ Añadir primer libro</button>
-        <button class="btn" onclick="loadSamples()">📖 Cargar ejemplos</button>
-      </div>
-    </div>
-  `;
-  document.getElementById('resultsInfo').textContent = '';
-  updateStats();
-} else {
-  renderAll();
+</script>
+
+<script>
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  if (s) s.classList.toggle('open');
+  if (o) o.classList.toggle('open');
+  document.body.style.overflow = s && s.classList.contains('open') ? 'hidden' : '';
+}
+function closeSidebar() {
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  if (s) s.classList.remove('open');
+  if (o) o.classList.remove('open');
+  document.body.style.overflow = '';
+}
+function bnav(filter, el) {
+  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const si = document.querySelector('.sidebar-item[data-filter="'+filter+'"]');
+  if (si && window.setFilter) window.setFilter(filter, si);
+  closeSidebar();
+  const main = document.querySelector('.main');
+  if (main) main.scrollTop = 0;
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 </script>
+
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button class="bnav-btn active" id="bnav-all" onclick="bnav('all',this)">
-      <span class="bnav-icon">📚</span>Todos
-    </button>
-    <button class="bnav-btn" id="bnav-reading" onclick="bnav('reading',this)">
-      <span class="bnav-icon">📖</span>Leyendo
-    </button>
-    <button class="bnav-btn" id="bnav-read" onclick="bnav('read',this)">
-      <span class="bnav-icon">✅</span>Leídos
-    </button>
-    <button class="bnav-btn" id="bnav-pending" onclick="bnav('pending',this)">
-      <span class="bnav-icon">⏳</span>Pendientes
-    </button>
-    <button class="bnav-btn" id="bnav-add" onclick="openAddModal()">
-      <span class="bnav-icon">＋</span>Añadir
-    </button>
+    <button class="bnav-btn active" id="bnav-all" onclick="bnav('all',this)"><span class="bnav-icon">📚</span>Todos</button>
+    <button class="bnav-btn" id="bnav-reading" onclick="bnav('reading',this)"><span class="bnav-icon">📖</span>Leyendo</button>
+    <button class="bnav-btn" id="bnav-read" onclick="bnav('read',this)"><span class="bnav-icon">✅</span>Leídos</button>
+    <button class="bnav-btn" id="bnav-pending" onclick="bnav('pending',this)"><span class="bnav-icon">⏳</span>Pendientes</button>
+    <button class="bnav-btn" id="bnav-add" onclick="openAddModal()"><span class="bnav-icon">＋</span>Añadir</button>
   </div>
 </nav>
-
-
-<script>
-// ── MOBILE SIDEBAR ──────────────────────────────────────────────────────────
-function toggleSidebar() {
-  const s = document.getElementById('sidebar');
-  const o = document.getElementById('sidebarOverlay');
-  s.classList.toggle('open');
-  o.classList.toggle('open');
-  document.body.style.overflow = s.classList.contains('open') ? 'hidden' : '';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-// ── BOTTOM NAV ───────────────────────────────────────────────────────────────
-function bnav(filter, el) {
-  // sync bottom nav active state
-  document.querySelectorAll('.bnav-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  // trigger the same setFilter used by sidebar
-  const sidebarEl = document.querySelector(`.sidebar-item[data-filter="${filter}"]`);
-  if (sidebarEl) setFilter(filter, sidebarEl);
-  closeSidebar();
-  // scroll main back to top
-  document.querySelector('.main').scrollTop = 0;
-}
-
-// Keep bnav in sync when sidebar items are tapped
-const _origSetFilter = setFilter;
-window.setFilter = function(filter, el) {
-  _origSetFilter(filter, el);
-  // sync bottom nav
-  document.querySelectorAll('.bnav-btn').forEach(b => {
-    b.classList.toggle('active', b.id === 'bnav-' + filter);
-  });
-  closeSidebar();
-};
-
-// ── SERVICE WORKER ───────────────────────────────────────────────────────────
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-</script>
 
 </body>
 </html>
