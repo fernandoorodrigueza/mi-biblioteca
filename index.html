@@ -1040,6 +1040,7 @@
         <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">☰</button>
       </div>
       <button class="btn" onclick="openCSVModal()">📥 Importar CSV</button>
+      <button class="btn" onclick="exportCSV()">📤 Exportar CSV</button>
       <button class="btn btn-primary" onclick="openAddModal()">+ Añadir libro</button>
     </div>
 
@@ -1971,6 +1972,36 @@ function importCSV() {
   if (overwritten) msg += `, ${overwritten} actualizado${overwritten !== 1 ? 's' : ''}`;
   if (skipped) msg += `, ${skipped} omitido${skipped !== 1 ? 's' : ''}`;
   showToast(msg, 'success');
+}
+
+function exportCSV() {
+  if (!library.length) { showToast('⚠️ No hay libros para exportar', 'error'); return; }
+
+  const STATUS_ES = { read: 'leído', reading: 'leyendo', pending: 'pendiente', wishlist: 'deseos' };
+  const header = 'titulo,autor,año,genero,estado,ubicacion,paginas,editorial,idioma,isbn,puntuacion,notas';
+
+  const rows = library.map(b => {
+    const esc = v => {
+      const s = (v ?? '').toString();
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    return [
+      esc(b.title), esc(b.author), esc(b.year || ''),
+      esc(b.genre), esc(STATUS_ES[b.status] || b.status),
+      esc(b.location), esc(b.pages || ''), esc(b.publisher),
+      esc(b.language), esc(b.isbn), esc(b.rating || ''), esc(b.notes)
+    ].join(',');
+  });
+
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); // BOM for Excel
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const date = new Date().toISOString().slice(0,10);
+  a.download = `mi_biblioteca_${date}.csv`;
+  a.click();
+  showToast(`✅ ${library.length} libros exportados`, 'success');
 }
 
 function downloadCSVTemplate() {
