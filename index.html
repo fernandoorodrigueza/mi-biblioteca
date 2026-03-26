@@ -2,12 +2,15 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Mi Biblioteca</title>
-  <link rel="apple-touch-icon" href="coverapp.png?v=2">
+<meta name="description" content="Tu biblioteca personal de libros">
+<meta name="theme-color" content="#b5622a">
+<link rel="apple-touch-icon" href="coverapp.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Biblioteca">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -935,6 +938,8 @@
         <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">☰</button>
       </div>
       <button class="btn" onclick="openCSVModal()">📥 Importar CSV</button>
+      <button class="btn" onclick="exportCSV()">📤 Exportar CSV</button>
+      <button class="btn btn-danger" onclick="confirmDeleteAll()">🗑 Borrar todo</button>
       <button class="btn btn-primary" onclick="openAddModal()">+ Añadir libro</button>
     </div>
 
@@ -1044,6 +1049,18 @@
     <div class="modal-footer">
       <button class="btn" onclick="closeModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="saveBook()">Guardar libro</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE ALL -->
+<div class="modal-overlay" id="confirmDeleteAllModal">
+  <div class="confirm-dialog">
+    <h3>¿Borrar toda la biblioteca?</h3>
+    <p>Se eliminarán <strong id="deleteAllCount">0</strong> libros permanentemente. Esta acción no se puede deshacer.</p>
+    <div class="actions">
+      <button class="btn" onclick="document.getElementById('confirmDeleteAllModal').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-danger" onclick="deleteAllBooks()">Borrar todo</button>
     </div>
   </div>
 </div>
@@ -1658,6 +1675,27 @@ window.setView = function(v) {
 };
 
 // ── EXPORT CSV ────────────────────────────────────────────────────────────────
+window.confirmDeleteAll = function() {
+  if (!library.length) { showToast('La biblioteca ya está vacía', 'error'); return; }
+  document.getElementById('deleteAllCount').textContent = library.length;
+  document.getElementById('confirmDeleteAllModal').classList.add('open');
+};
+
+window.deleteAllBooks = async function() {
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    const batch = writeBatch(db);
+    library.forEach(b => batch.delete(doc(booksCol(), String(b.id))));
+    await batch.commit();
+    document.getElementById('confirmDeleteAllModal').classList.remove('open');
+    closeDetail();
+    showToast('🗑 Biblioteca borrada', 'success');
+  } catch(e) {
+    showToast('Error al borrar', 'error');
+  }
+};
+
 window.exportCSV = function() {
   if (!library.length) { showToast('No hay libros para exportar', 'error'); return; }
   const SE = { read:'leído', reading:'leyendo', pending:'pendiente', wishlist:'deseos' };
@@ -1803,7 +1841,7 @@ document.addEventListener('keydown', e => {
     closeDetail();
   }
 });
-['addModal','confirmModal','csvModal'].forEach(id => {
+['addModal','confirmModal','csvModal','confirmDeleteAllModal'].forEach(id => {
   const el=document.getElementById(id);
   if(el) el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
 });
