@@ -1504,6 +1504,7 @@ function applyFilters() {
   if (currentView === 'grid') renderGrid(books, container);
   else renderList(books, container);
 }
+window.applyFilters = applyFilters;
 
 const STATUS_LABELS = { read:'Leído', reading:'Leyendo', pending:'Pendiente', wishlist:'Deseos' };
 const STATUS_BADGES = { read:'badge-read', reading:'badge-reading', pending:'badge-pending', wishlist:'badge-wishlist' };
@@ -1511,23 +1512,32 @@ function starsHTML(r) { return [1,2,3,4,5].map(i=>`<span class="star ${i<=r?'fil
 
 // ── COVERS ────────────────────────────────────────────────────────────────────
 async function fetchCover(book) {
-  if (book.coverUrl || book.coverUrl === null) return;
-  book.coverUrl = null;
+  if (book.coverUrl === null || book._fetchingCover) return;
+  if (typeof book.coverUrl === 'string' && book.coverUrl.length > 0) return;
+  book._fetchingCover = true;
+  const libBook = library.find(b => String(b.id) === String(book.id));
   try {
-    const q = encodeURIComponent(`${book.title} ${book.author}`);
-    const res = await fetch(`https://openlibrary.org/search.json?q=${q}&limit=5&fields=cover_i`);
-    if (!res.ok) return;
+    const q = encodeURIComponent(book.title + ' ' + book.author);
+    const res = await fetch('https://openlibrary.org/search.json?q=' + q + '&limit=5&fields=cover_i');
+    if (!res.ok) { if (libBook) libBook._fetchingCover = false; return; }
     const data = await res.json();
     const hit = data.docs && data.docs.find(d => d.cover_i);
     if (hit && hit.cover_i) {
-      book.coverUrl = `https://covers.openlibrary.org/b/id/${hit.cover_i}-M.jpg`;
-      if (currentUser) setDoc(doc(booksCol(), String(book.id)), { coverUrl: book.coverUrl }, { merge: true });
-      const card = document.querySelector(`[data-book-id="${book.id}"] .book-cover`);
-      if (card) applyCoverToEl(card, book.coverUrl);
+      const url = 'https://covers.openlibrary.org/b/id/' + hit.cover_i + '-M.jpg';
+      if (libBook) libBook.coverUrl = url;
+      if (currentUser) setDoc(doc(booksCol(), String(book.id)), { coverUrl: url }, { merge: true });
+      const card = document.querySelector('[data-book-id="' + book.id + '"] .book-cover');
+      if (card) applyCoverToEl(card, url);
       const dc = document.querySelector('.detail-cover');
-      if (dc && String(selectedBookId) === String(book.id)) applyCoverToEl(dc, book.coverUrl);
+      if (dc && String(selectedBookId) === String(book.id)) applyCoverToEl(dc, url);
+    } else {
+      if (libBook) libBook.coverUrl = null;
+      if (currentUser) setDoc(doc(booksCol(), String(book.id)), { coverUrl: null }, { merge: true });
     }
-  } catch(e) {}
+  } catch(e) {
+    console.warn('Cover fetch failed:', book.title, e);
+    if (libBook) libBook._fetchingCover = false;
+  }
 }
 
 function applyCoverToEl(el, url) {
@@ -1542,7 +1552,9 @@ function applyCoverToEl(el, url) {
 }
 
 function ensureCovers(books) {
-  books.filter(b => b.coverUrl === undefined).forEach((b, i) => setTimeout(() => fetchCover(b), i * 200));
+  books
+    .filter(b => !b.coverUrl && b.coverUrl !== null && !b._fetchingCover)
+    .forEach((b, i) => setTimeout(() => fetchCover(b), i * 300));
 }
 
 function coverHTML(book) {
@@ -2034,6 +2046,16 @@ document.addEventListener('keydown', e => {
 ['addModal','confirmModal','csvModal','confirmDeleteAllModal'].forEach(id => {
   const el=document.getElementById(id);
   if(el) el.addEventListener('click', e => { if(e.target===el) el.classList.remove('open'); });
+});
+
+// ── EXPOSE FUNCTIONS CALLED FROM HTML ATTRIBUTES ──────────────────────────────
+// (required because this script runs as type="module" which has its own scope)
+Object.assign(window, {
+  applyFilters, renderAll, updateStats, updateSidebar,
+  setGenreFilter, renderGrid, renderList,
+  fetchCover, applyCoverToEl, ensureCovers, coverHTML,
+  showToast, starsHTML, getFiltered,
+  selectMode: () => selectMode, selectedIds: () => selectedIds,
 });
 
 </script>
