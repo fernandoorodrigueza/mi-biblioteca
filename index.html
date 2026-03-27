@@ -839,6 +839,82 @@
   }
   @media (max-width:380px) { .book-cover { height:140px; } }
 
+
+  /* ── SELECTION MODE ──────────────────────────────────────────────────── */
+  .book-card.selectable { cursor: pointer; }
+  .book-card.selected {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 5px var(--accent-soft), 4px 10px 24px rgba(100,70,40,0.18);
+  }
+  .book-card .sel-check {
+    display: none;
+    position: absolute;
+    top: 0.45rem; left: 0.45rem;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--border2);
+    z-index: 10;
+    align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    transition: all 0.15s;
+  }
+  .selecting .book-card .sel-check { display: flex; }
+  .book-card.selected .sel-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .book-row.selected {
+    background: var(--accent-soft) !important;
+    border-left-color: var(--accent) !important;
+    outline: 1px solid var(--accent);
+  }
+  .book-row .sel-check {
+    display: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--border2);
+    flex-shrink: 0;
+    align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    transition: all 0.15s;
+  }
+  .selecting .book-row .sel-check { display: flex; }
+  .book-row.selected .sel-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* bulk action bar */
+  .bulk-bar {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 1rem;
+    background: var(--accent-soft);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .bulk-bar.visible { display: flex; }
+  .bulk-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .bulk-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto; }
+  .bulk-sep { width: 1px; background: var(--border2); align-self: stretch; }
+
+  /* select mode toggle button — active state */
+  .btn.select-active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
 </style>
 </head>
 <body>
@@ -937,6 +1013,7 @@
         <button class="view-btn active" id="gridBtn" onclick="setView('grid')" title="Cuadrícula">⊞</button>
         <button class="view-btn" id="listBtn" onclick="setView('list')" title="Lista">☰</button>
       </div>
+      <button class="btn" id="selectModeBtn" onclick="toggleSelectMode()">☑ Seleccionar</button>
       <button class="btn" onclick="openCSVModal()">📥 Importar CSV</button>
       <button class="btn" onclick="exportCSV()">📤 Exportar CSV</button>
       <button class="btn btn-danger" onclick="confirmDeleteAll()">🗑 Borrar todo</button>
@@ -944,6 +1021,25 @@
     </div>
 
     <div class="results-info" id="resultsInfo"></div>
+
+    <!-- BULK ACTION BAR -->
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bulk-count" id="bulkCount">0 seleccionados</span>
+      <button class="btn" onclick="selectAllVisible()" style="font-size:.8rem;padding:.35rem .75rem">Seleccionar todo</button>
+      <button class="btn" onclick="clearSelection()" style="font-size:.8rem;padding:.35rem .75rem">Quitar selección</button>
+      <div class="bulk-sep"></div>
+      <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3)">Asignar a:</span>
+      <button class="btn" onclick="bulkSetLocation('cdmx')" style="font-size:.8rem;padding:.35rem .75rem">🏙 CDMX</button>
+      <button class="btn" onclick="bulkSetLocation('mixqui')" style="font-size:.8rem;padding:.35rem .75rem">🌿 Mixqui</button>
+      <button class="btn" onclick="bulkSetLocation('')" style="font-size:.8rem;padding:.35rem .75rem">— Sin ubicación</button>
+      <div class="bulk-sep"></div>
+      <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3)">Estado:</span>
+      <button class="btn" onclick="bulkSetStatus('read')" style="font-size:.8rem;padding:.35rem .75rem">✅ Leído</button>
+      <button class="btn" onclick="bulkSetStatus('reading')" style="font-size:.8rem;padding:.35rem .75rem">📖 Leyendo</button>
+      <button class="btn" onclick="bulkSetStatus('pending')" style="font-size:.8rem;padding:.35rem .75rem">⏳ Pendiente</button>
+      <button class="btn" onclick="bulkSetStatus('wishlist')" style="font-size:.8rem;padding:.35rem .75rem">⭐ Deseos</button>
+    </div>
+
     <div id="booksContainer"></div>
   </main>
 
@@ -1456,11 +1552,103 @@ function coverHTML(book) {
 }
 
 // ── GRID ──────────────────────────────────────────────────────────────────────
+// ── SELECTION MODE ────────────────────────────────────────────────────────────
+let selectMode = false;
+let selectedIds = new Set();
+
+window.toggleSelectMode = function() {
+  selectMode = !selectMode;
+  selectedIds.clear();
+  const btn = document.getElementById('selectModeBtn');
+  const container = document.getElementById('booksContainer');
+  btn.classList.toggle('select-active', selectMode);
+  btn.textContent = selectMode ? '✕ Cancelar' : '☑ Seleccionar';
+  container.classList.toggle('selecting', selectMode);
+  document.getElementById('bulkBar').classList.toggle('visible', selectMode);
+  updateBulkCount();
+  applyFilters(); // re-render with/without checkboxes
+};
+
+window.toggleSelectBook = function(id, e) {
+  e.stopPropagation();
+  if (!selectMode) return;
+  const sid = String(id);
+  if (selectedIds.has(sid)) selectedIds.delete(sid);
+  else selectedIds.add(sid);
+  // update visual without full re-render
+  const card = document.querySelector(`[data-book-id="${sid}"]`);
+  if (card) {
+    card.classList.toggle('selected', selectedIds.has(sid));
+    const chk = card.querySelector('.sel-check');
+    if (chk) chk.textContent = selectedIds.has(sid) ? '✓' : '';
+  }
+  updateBulkCount();
+};
+
+window.selectAllVisible = function() {
+  const cards = document.querySelectorAll('[data-book-id]');
+  cards.forEach(c => {
+    const sid = c.dataset.bookId;
+    selectedIds.add(sid);
+    c.classList.add('selected');
+    const chk = c.querySelector('.sel-check');
+    if (chk) chk.textContent = '✓';
+  });
+  updateBulkCount();
+};
+
+window.clearSelection = function() {
+  selectedIds.clear();
+  document.querySelectorAll('[data-book-id].selected').forEach(c => {
+    c.classList.remove('selected');
+    const chk = c.querySelector('.sel-check');
+    if (chk) chk.textContent = '';
+  });
+  updateBulkCount();
+};
+
+function updateBulkCount() {
+  const n = selectedIds.size;
+  document.getElementById('bulkCount').textContent =
+    n === 0 ? 'Ninguno seleccionado' : `${n} libro${n !== 1 ? 's' : ''} seleccionado${n !== 1 ? 's' : ''}`;
+}
+
+window.bulkSetLocation = async function(loc) {
+  if (!selectedIds.size) { showToast('Selecciona al menos un libro', 'error'); return; }
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    const batch = writeBatch(db);
+    selectedIds.forEach(id => batch.set(doc(booksCol(), id), { location: loc }, { merge: true }));
+    await batch.commit();
+    const label = loc === 'cdmx' ? '🏙 CDMX' : loc === 'mixqui' ? '🌿 Mixqui' : 'Sin ubicación';
+    showToast(`✅ ${selectedIds.size} libro${selectedIds.size!==1?'s':''} → ${label}`, 'success');
+    clearSelection();
+  } catch(e) { showToast('Error al actualizar', 'error'); }
+};
+
+window.bulkSetStatus = async function(status) {
+  if (!selectedIds.size) { showToast('Selecciona al menos un libro', 'error'); return; }
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    const batch = writeBatch(db);
+    selectedIds.forEach(id => batch.set(doc(booksCol(), id), { status }, { merge: true }));
+    await batch.commit();
+    const labels = { read:'✅ Leído', reading:'📖 Leyendo', pending:'⏳ Pendiente', wishlist:'⭐ Deseos' };
+    showToast(`✅ ${selectedIds.size} libro${selectedIds.size!==1?'s':''} → ${labels[status]}`, 'success');
+    clearSelection();
+  } catch(e) { showToast('Error al actualizar', 'error'); }
+};
+
+// ── GRID ──────────────────────────────────────────────────────────────────────
 function renderGrid(books, container) {
-  container.className = 'books-grid';
+  container.className = 'books-grid' + (selectMode ? ' selecting' : '');
   container.innerHTML = books.map(b => {
     const color = getGenreColor(b.genre);
-    return `<div class="book-card" onclick="showDetail('${b.id}')" data-book-id="${b.id}">
+    const sel = selectedIds.has(String(b.id));
+    return `<div class="book-card${sel?' selected':''}" onclick="${selectMode ? `toggleSelectBook('${b.id}',event)` : `showDetail('${b.id}')`}" data-book-id="${b.id}">
+      <div class="sel-check">${sel?'✓':''}</div>
       <div class="book-cover${b.coverUrl?' has-cover':''}" style="background:linear-gradient(135deg,${color}22,${color}44);color:${color}">
         ${coverHTML(b)}
         <div class="book-cover-spine" style="background:${color}"></div>
@@ -1479,10 +1667,12 @@ function renderGrid(books, container) {
 
 // ── LIST ──────────────────────────────────────────────────────────────────────
 function renderList(books, container) {
-  container.className = 'books-list';
+  container.className = 'books-list' + (selectMode ? ' selecting' : '');
   container.innerHTML = books.map(b => {
     const color = getGenreColor(b.genre);
-    return `<div class="book-row" onclick="showDetail('${b.id}')">
+    const sel = selectedIds.has(String(b.id));
+    return `<div class="book-row${sel?' selected':''}" onclick="${selectMode ? `toggleSelectBook('${b.id}',event)` : `showDetail('${b.id}')`}" data-book-id="${b.id}">
+      <div class="sel-check">${sel?'✓':''}</div>
       <div class="book-row-color" style="background:${color}"></div>
       <div class="book-row-title"><div class="t">${b.title}</div><div class="a">${b.author}</div></div>
       <div class="book-row-genre">${b.genre||'—'}</div>
@@ -1747,16 +1937,16 @@ function processCSVFile(file) {
   const reader=new FileReader(); reader.onload=e=>parseCSV(e.target.result); reader.readAsText(file,'UTF-8');
 }
 
-const COL_MAP={titulo:'title',title:'title',autor:'author',author:'author','año':'year',anio:'year',year:'year',genero:'genre',genre:'genre',estado:'status',status:'status',ubicacion:'location',location:'location',paginas:'pages',pages:'pages',editorial:'publisher',publisher:'publisher',idioma:'language',language:'language',isbn:'isbn',puntuacion:'rating',rating:'rating',notas:'notes',notes:'notes'};
+const COL_MAP={titulo:'title',title:'title',autor:'author',author:'author','año':'year',anio:'year',year:'year',genero:'genre','género':'genre',genre:'genre',estado:'status',status:'status',ubicacion:'location','ubicación':'location',location:'location',paginas:'pages','páginas':'pages',pages:'pages',editorial:'publisher',publisher:'publisher',idioma:'language',language:'language',isbn:'isbn',puntuacion:'rating','puntuación':'rating',rating:'rating',notas:'notes',notes:'notes'};
 const SMAP={leído:'read',leido:'read',read:'read',leyendo:'reading',reading:'reading',pendiente:'pending',pending:'pending',deseos:'wishlist',wishlist:'wishlist'};
-const LMAP={cdmx:'cdmx',mixqui:'mixqui'};
+const LMAP={cdmx:'cdmx','ciudad de mexico':'cdmx','ciudad de méxico':'cdmx','cdmx ':'cdmx',mixqui:'mixqui','mixquic':'mixqui','mixqui ':'mixqui'};
 
 function parseCSV(text) {
   const fl=text.split('\n')[0];
   const delim=(fl.match(/;/g)||[]).length>(fl.match(/,/g)||[]).length?';':',';
   const lines=text.trim().split('\n').map(l=>l.trim()).filter(l=>l);
   if(lines.length<2){showToast('CSV vacío','error');return;}
-  const hdrs=splitCSVLine(lines[0],delim).map(h=>h.toLowerCase().trim().replace(/"/g,''));
+  const hdrs=splitCSVLine(lines[0],delim).map(h=>h.toLowerCase().trim().replace(/"/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,''));
   const mh=hdrs.map(h=>COL_MAP[h]||null);
   const errors=[]; csvParsedBooks=[];
   for(let i=1;i<lines.length;i++){
@@ -1765,7 +1955,7 @@ function parseCSV(text) {
     mh.forEach((f,idx)=>{if(f)row[f]=(vals[idx]||'').trim().replace(/^"|"$/g,'');});
     if(!row.title){errors.push(`Fila ${i+1}: sin título`);continue;}
     if(!row.author){errors.push(`Fila ${i+1}: sin autor`);continue;}
-    csvParsedBooks.push({title:row.title,author:row.author,year:parseInt(row.year)||null,genre:row.genre||'',status:SMAP[(row.status||'').toLowerCase()]||'pending',location:LMAP[(row.location||'').toLowerCase()]||'',pages:parseInt(row.pages)||null,publisher:row.publisher||'',language:row.language||'',isbn:row.isbn||'',rating:Math.min(5,Math.max(0,parseInt(row.rating)||0)),notes:row.notes||''});
+    csvParsedBooks.push({title:row.title,author:row.author,year:parseInt(row.year)||null,genre:row.genre||'',status:SMAP[(row.status||'').toLowerCase()]||'pending',location:LMAP[(row.location||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'')]||'',pages:parseInt(row.pages)||null,publisher:row.publisher||'',language:row.language||'',isbn:row.isbn||'',rating:Math.min(5,Math.max(0,parseInt(row.rating)||0)),notes:row.notes||''});
   }
   renderCSVPreview(csvParsedBooks,errors);
 }
