@@ -1038,6 +1038,15 @@
       <button class="btn" onclick="bulkSetStatus('reading')" style="font-size:.8rem;padding:.35rem .75rem">📖 Leyendo</button>
       <button class="btn" onclick="bulkSetStatus('pending')" style="font-size:.8rem;padding:.35rem .75rem">⏳ Pendiente</button>
       <button class="btn" onclick="bulkSetStatus('wishlist')" style="font-size:.8rem;padding:.35rem .75rem">⭐ Deseos</button>
+      <div class="bulk-sep"></div>
+      <span style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text3)">Categoría:</span>
+      <button class="btn" onclick="bulkSetGenre('Poesía')" style="font-size:.8rem;padding:.35rem .75rem">🖊 Poesía</button>
+      <button class="btn" onclick="bulkSetGenre('Novela')" style="font-size:.8rem;padding:.35rem .75rem">📕 Novela</button>
+      <button class="btn" onclick="bulkSetGenre('Ensayo')" style="font-size:.8rem;padding:.35rem .75rem">📝 Ensayo</button>
+      <button class="btn" onclick="bulkSetGenre('Novela Gráfica')" style="font-size:.8rem;padding:.35rem .75rem">🎨 Novela Gráfica</button>
+      <button class="btn" onclick="bulkSetGenre('Reportaje')" style="font-size:.8rem;padding:.35rem .75rem">📰 Reportaje</button>
+      <button class="btn" onclick="bulkSetGenre('Teatro')" style="font-size:.8rem;padding:.35rem .75rem">🎭 Teatro</button>
+      <button class="btn" onclick="bulkSetGenre('Cuentos')" style="font-size:.8rem;padding:.35rem .75rem">📖 Cuentos</button>
     </div>
 
     <div id="booksContainer"></div>
@@ -1654,6 +1663,19 @@ window.bulkSetStatus = async function(status) {
     await batch.commit();
     const labels = { read:'✅ Leído', reading:'📖 Leyendo', pending:'⏳ Pendiente', wishlist:'⭐ Deseos' };
     showToast(`✅ ${selectedIds.size} libro${selectedIds.size!==1?'s':''} → ${labels[status]}`, 'success');
+    clearSelection();
+  } catch(e) { showToast('Error al actualizar', 'error'); }
+};
+
+window.bulkSetGenre = async function(genre) {
+  if (!selectedIds.size) { showToast('Selecciona al menos un libro', 'error'); return; }
+  if (!currentUser) return;
+  setSyncing(true);
+  try {
+    const batch = writeBatch(db);
+    selectedIds.forEach(id => batch.set(doc(booksCol(), id), { genre }, { merge: true }));
+    await batch.commit();
+    showToast(`✅ ${selectedIds.size} libro${selectedIds.size!==1?'s':''} → ${genre}`, 'success');
     clearSelection();
   } catch(e) { showToast('Error al actualizar', 'error'); }
 };
