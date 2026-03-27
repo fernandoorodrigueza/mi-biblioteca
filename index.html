@@ -1343,8 +1343,13 @@ async function saveToCloud(book) {
   if (!currentUser) return;
   setSyncing(true);
   try {
-    await setDoc(doc(booksCol(), String(book.id)), { ...book, updatedAt: serverTimestamp() });
+    // Firestore rejects undefined values — strip them before saving
+    const clean = Object.fromEntries(
+      Object.entries(book).filter(([_, v]) => v !== undefined)
+    );
+    await setDoc(doc(booksCol(), String(clean.id)), { ...clean, updatedAt: serverTimestamp() });
   } catch(e) {
+    console.error('saveToCloud error:', e);
     showToast('No se pudo guardar', 'error');
   }
 }
@@ -1803,14 +1808,19 @@ window.saveBook = async function() {
   };
   if (editingId) {
     const prev = library.find(b => String(b.id) === String(editingId)) || {};
-    if (prev.title !== data.title || prev.author !== data.author) data.coverUrl = undefined;
-    await saveToCloud({ ...prev, ...data, id: String(editingId) });
-    showToast('Libro actualizado', 'success');
+    const merged = { ...prev, ...data, id: String(editingId) };
+    // If title or author changed, reset the cover so it gets re-fetched
+    if (prev.title !== data.title || prev.author !== data.author) {
+      delete merged.coverUrl;
+      delete merged._fetchingCover;
+    }
+    await saveToCloud(merged);
+    showToast('✅ Libro actualizado', 'success');
     if (String(selectedBookId) === String(editingId)) showDetail(editingId);
   } else {
     const newId = String(Date.now());
     await saveToCloud({ id: newId, ...data, added: Date.now() });
-    showToast('Libro añadido a la biblioteca', 'success');
+    showToast('✅ Libro añadido a la biblioteca', 'success');
   }
   closeModal();
 };
