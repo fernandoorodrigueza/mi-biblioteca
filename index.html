@@ -1792,7 +1792,10 @@ window.openEditModal = function(id) {
   document.getElementById('addModal').classList.add('open');
 };
 
-window.closeModal = function() { document.getElementById('addModal').classList.remove('open'); };
+window.closeModal = function() {
+  document.getElementById('addModal').classList.remove('open');
+  editingId = null;
+};
 window.setRating = function(v) { currentRating = v; updateStarUI(); };
 
 function updateStarUI() {
