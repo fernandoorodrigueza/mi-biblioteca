@@ -1456,6 +1456,7 @@ function updateSidebar() {
   const genreCounts = {};
   library.forEach(b => { if (b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1; });
   const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+  const noCategoryCount = library.filter(b => !b.genre).length;
   const gl = document.getElementById('genreList');
   if (gl) {
     gl.innerHTML = '';
@@ -1467,6 +1468,14 @@ function updateSidebar() {
       div.onclick = () => setGenreFilter(genre, div);
       gl.appendChild(div);
     });
+    // "Sin categoría" at the bottom, only shown if there are books without genre
+    if (noCategoryCount > 0) {
+      const div = document.createElement('div');
+      div.className = 'sidebar-item' + (currentGenreFilter === '__none__' ? ' active' : '');
+      div.innerHTML = `<span class="genre-dot" style="background:var(--text3)"></span><em>Sin categoría</em><span class="count">${noCategoryCount}</span>`;
+      div.onclick = () => setGenreFilter('__none__', div);
+      gl.appendChild(div);
+    }
   }
   const dl = document.getElementById('genreDatalist');
   if (dl) dl.innerHTML = sorted.map(([g]) => `<option value="${g}">`).join('');
@@ -1482,7 +1491,8 @@ function getFiltered() {
     (b.genre && b.genre.toLowerCase().includes(q))
   );
   if (currentFilter !== 'all') books = books.filter(b => b.status === currentFilter);
-  if (currentGenreFilter) books = books.filter(b => b.genre === currentGenreFilter);
+  if (currentGenreFilter === '__none__') books = books.filter(b => !b.genre);
+  else if (currentGenreFilter) books = books.filter(b => b.genre === currentGenreFilter);
   if (currentLocationFilter) books = books.filter(b => b.location === currentLocationFilter);
   const sort = (document.getElementById('sortSelect') || {}).value || 'title';
   books.sort((a, b) => {
